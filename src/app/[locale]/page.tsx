@@ -248,6 +248,7 @@ export default async function HomePage({
                 <div className="text-sm font-semibold mt-4 underline underline-offset-4">
                   {dict.blog.readMore}
                 </div>
+                </div>
               </Link>
             ))}
           </div>
