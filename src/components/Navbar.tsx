@@ -19,7 +19,7 @@ function FlagTR() {
 
 function FlagEN() {
   return (
-    <svg viewBox="0 0 24 16" className="w-8 h-5 rounded-[2px] overflow-hidden shrink-0 flag-wave">
+    <svg viewBox="0 0 24 16" className="w-8 h-5 rounded-[2px] overflow-hidden shrink-0">
       <rect width="24" height="16" fill="#012169" />
       <path d="M0 0l24 16M24 0L0 16" stroke="#fff" strokeWidth="3" />
       <path d="M0 0l24 16M24 0L0 16" stroke="#C8102E" strokeWidth="1.4" />
