@@ -1,0 +1,301 @@
+{
+  "categories": [
+    {
+      "id": "1",
+      "slug": "paketleme-makinalari",
+      "name": "Paketleme Makinaları",
+      "nameEn": "Packaging Machines",
+      "image": "/products/4-terazili-linear-dikey-paketleme-makinasi.webp"
+    },
+    {
+      "id": "2",
+      "slug": "dolum-makinalari",
+      "name": "Dolum Makinaları",
+      "nameEn": "Filling Machines",
+      "image": "/products/4lu-stick-toz-dolum-ve-paketleme-makinesi.png"
+    },
+    {
+      "id": "3",
+      "slug": "konveyor-ve-helezon",
+      "name": "Konveyör ve Helezonlar",
+      "nameEn": "Conveyors & Augers",
+      "image": "/products/urun-tasima-helezonu.png"
+    },
+    {
+      "id": "4",
+      "slug": "diger-cihazlar",
+      "name": "Diğer Cihazlar",
+      "nameEn": "Other Devices",
+      "image": "/products/vidali-guadro-dolum-paketleme-makinasi.jpeg"
+    }
+  ],
+  "products": [
+    {
+      "id": "1",
+      "categoryId": "1",
+      "slug": "2-terazili-linear-paketleme-makinasi",
+      "name": "2 Terazili Linear Paketleme Makinası",
+      "nameEn": "2-Scale Linear Packaging Machine",
+      "description": "Taneli ve granüllü ürünlerin hassas gramajlama ile paketlenmesini sağlayan 2 terazili linear paketleme makinası.",
+      "descriptionEn": "2-scale linear packaging machine for precise weighing and packaging of granular products.",
+      "image": "/products/2-terazili-linear-paketleme-makinasi.webp",
+      "featured": true
+    },
+    {
+      "id": "2",
+      "categoryId": "1",
+      "slug": "4-terazili-linear-dikey-paketleme-makinasi",
+      "name": "4 Terazili Linear Dikey Paketleme Makinası",
+      "nameEn": "4-Scale Linear Vertical Packaging Machine",
+      "description": "Yüksek kapasiteli 4 terazili dikey paketleme makinası.",
+      "descriptionEn": "High-capacity 4-scale vertical packaging machine.",
+      "image": "/products/4-terazili-linear-dikey-paketleme-makinasi.webp",
+      "featured": true
+    },
+    {
+      "id": "3",
+      "categoryId": "1",
+      "slug": "asansorlu-dikey-paketleme-makinasi",
+      "name": "Asansörlü Dikey Paketleme Makinası",
+      "nameEn": "Elevator Vertical Packaging Machine",
+      "description": "Asansörlü besleme sistemli dikey paketleme makinası.",
+      "descriptionEn": "Vertical packaging machine with elevator feeding system.",
+      "image": "/products/asansorlu-dikey-paketleme-makinasi.webp",
+      "featured": false
+    },
+    {
+      "id": "4",
+      "categoryId": "1",
+      "slug": "havali-paketleme-makinasi",
+      "name": "Havalı Paketleme Makinası",
+      "nameEn": "Air Cushion Packaging Machine",
+      "description": "Pnömatik sistemli havalı paketleme makinası.",
+      "descriptionEn": "Pneumatic air packaging machine.",
+      "image": "/products/havali-paketleme-makinasi.png",
+      "featured": false
+    },
+    {
+      "id": "5",
+      "categoryId": "1",
+      "slug": "kucuk-tip-baharat-paketleme-makinasi",
+      "name": "Küçük Tip Baharat Paketleme Makinası",
+      "nameEn": "Compact Spice Packaging Machine",
+      "description": "Baharat ve toz ürünler için kompakt paketleme makinası.",
+      "descriptionEn": "Compact packaging machine for spices and powdered products.",
+      "image": "/products/kucuk-tip-baharat-paketleme-makinasi.webp",
+      "featured": false
+    },
+    {
+      "id": "6",
+      "categoryId": "1",
+      "slug": "tek-kefe-kucuk-paketleme-makinasi",
+      "name": "Tek Kefe Küçük Paketleme Makinası",
+      "nameEn": "Single-Scale Compact Packaging Machine",
+      "description": "Küçük gramajlı ürünler için tek kefeli paketleme makinası.",
+      "descriptionEn": "Single-scale packaging machine for small-weight products.",
+      "image": "/products/tek-kefe-kucuk-paketleme-makinasi.png",
+      "featured": false
+    },
+    {
+      "id": "7",
+      "categoryId": "1",
+      "slug": "volumetrik-paketleme-makinasi",
+      "name": "Volümetrik Paketleme Makinası",
+      "nameEn": "Volumetric Packaging Machine",
+      "description": "Volümetrik ölçüm sistemli paketleme makinası.",
+      "descriptionEn": "Packaging machine with volumetric measuring system.",
+      "image": "/products/volumetrik-paketleme-makinasi.webp",
+      "featured": false
+    },
+    {
+      "id": "8",
+      "categoryId": "1",
+      "slug": "vidali-paketleme-makinasi",
+      "name": "Vidalı Paketleme Makinası",
+      "nameEn": "Auger Packaging Machine",
+      "description": "Toz ürünler için vidalı paketleme makinası.",
+      "descriptionEn": "Auger packaging machine for powdered products.",
+      "image": "/products/vidali-paketleme-makinasi.webp",
+      "featured": false
+    },
+    {
+      "id": "9",
+      "categoryId": "2",
+      "slug": "terazili-manuel-dolum-makinasi",
+      "name": "Terazili Manuel Dolum Makinası",
+      "nameEn": "Weighing Manual Filling Machine",
+      "description": "Terazili manuel dolum makinası.",
+      "descriptionEn": "Manual filling machine with scale.",
+      "image": "/products/terazili-manuel-dolum-makinasi.webp",
+      "featured": false
+    },
+    {
+      "id": "10",
+      "categoryId": "2",
+      "slug": "vidali-dolum-makinasi",
+      "name": "Vidalı Dolum Makinası",
+      "nameEn": "Auger Filling Machine",
+      "description": "Toz ve granül ürünler için vidalı dolum makinası.",
+      "descriptionEn": "Auger filling machine for powder and granular products.",
+      "image": "/products/vidali-dolum-makinasi.jpg",
+      "featured": false
+    },
+    {
+      "id": "11",
+      "categoryId": "2",
+      "slug": "yari-otomatik-vidali-dolum-sistemi",
+      "name": "Yarı Otomatik Vidalı Dolum Sistemi",
+      "nameEn": "Semi-Automatic Auger Filling System",
+      "description": "Yarı otomatik vidalı dolum sistemi.",
+      "descriptionEn": "Semi-automatic auger filling system.",
+      "image": "/products/yari-otomatik-vidali-dolum-sistemi.webp",
+      "featured": false
+    },
+    {
+      "id": "12",
+      "categoryId": "2",
+      "slug": "dambil-dolum-makinasi-yari-otomatik",
+      "name": "Dambıl Dolum Makinası Yarı Otomatik",
+      "nameEn": "Semi-Automatic Dumbbell Filling Machine",
+      "description": "Yarı otomatik dambıl dolum makinası.",
+      "descriptionEn": "Semi-automatic dumbbell filling machine.",
+      "image": "/products/dambil-dolum-makinasi-yari-otomatik.jpg",
+      "featured": true
+    },
+    {
+      "id": "13",
+      "categoryId": "2",
+      "slug": "4lu-stick-toz-dolum-ve-paketleme-makinesi",
+      "name": "4'lü Stick (Toz) Dolum ve Paketleme Makinesi",
+      "nameEn": "4-Lane Stick (Powder) Filling & Packaging Machine",
+      "description": "4 kanallı stick toz dolum ve paketleme makinesi.",
+      "descriptionEn": "4-lane stick powder filling and packaging machine.",
+      "image": "/products/4lu-stick-toz-dolum-ve-paketleme-makinesi.png",
+      "featured": true
+    },
+    {
+      "id": "14",
+      "categoryId": "3",
+      "slug": "duz-pvc-bantli-konveyor",
+      "name": "Düz PVC Bantlı Konveyör",
+      "nameEn": "Flat PVC Belt Conveyor",
+      "description": "Düz PVC bantlı ürün taşıma konveyörü.",
+      "descriptionEn": "Flat PVC belt product conveyor.",
+      "image": "/products/duz-pvc-bantli-konveyor.jpeg",
+      "featured": false
+    },
+    {
+      "id": "15",
+      "categoryId": "3",
+      "slug": "urun-tasima-helezonu",
+      "name": "Ürün Taşıma Helezonu",
+      "nameEn": "Product Transfer Auger",
+      "description": "Ürün taşıma helezonu.",
+      "descriptionEn": "Product transfer auger.",
+      "image": "/products/urun-tasima-helezonu.png",
+      "featured": false
+    },
+    {
+      "id": "16",
+      "categoryId": "3",
+      "slug": "buz-dolum-helezonu-krom-15-mt",
+      "name": "Buz Dolum Helezonu Krom 1.5 Mt",
+      "nameEn": "Ice Filling Auger Chrome 1.5 m",
+      "description": "Krom 1.5 metre buz dolum helezonu.",
+      "descriptionEn": "1.5 m chrome ice filling auger.",
+      "image": "/products/buz-dolum-helezonu-krom-15-mt.jpeg",
+      "featured": true
+    },
+    {
+      "id": "17",
+      "categoryId": "4",
+      "slug": "vidali-guadro-dolum-paketleme-makinasi",
+      "name": "Vidalı Guadro Dolum+Paketleme Makinası",
+      "nameEn": "Auger Quadro Filling & Packaging Machine",
+      "description": "Vidalı guadro dolum ve paketleme makinası.",
+      "descriptionEn": "Auger quadro filling and packaging machine.",
+      "image": "/products/vidali-guadro-dolum-paketleme-makinasi.jpeg",
+      "featured": true
+    }
+  ],
+  "posts": [
+    {
+      "id": "1",
+      "slug": "vidali-paketleme-makinalari",
+      "title": "Vidalı Paketleme Makinaları: Güvenilir ve Verimli Çözümler",
+      "titleEn": "Auger Packaging Machines: Reliable and Efficient Solutions",
+      "date": "2025-03-11",
+      "excerpt": "Vidalı paketleme makinaları, üretim süreçlerinde ürünlerin ambalajlama işlemlerini hızlandırır.",
+      "excerptEn": "Auger packaging machines speed up product packaging processes in production.",
+      "content": "Vidalı paketleme makinaları, üretim süreçlerinde çok çeşitli malzemeleri kullanarak ürünlerin kutulama ve ambalajlama işlemlerini hızlandırır. Bu makinalar, ürünlerin kutulama ve ambalajlama işlemlerinde kullanılan malzemeler arasında önemli bir yer tutar.",
+      "contentEn": "Auger packaging machines accelerate boxing and packaging of products using a wide range of materials in production processes.",
+      "image": "/blog/vidali-paketleme-makinalari.jpg",
+      "tag": "Makale"
+    },
+    {
+      "id": "2",
+      "slug": "yapay-zeka-ve-makinalar",
+      "title": "Yapay Zeka ve Makinalar: Yeni Nesil Teknolojilerin Gücü",
+      "titleEn": "AI and Machines: The Power of Next-Gen Technologies",
+      "date": "2025-03-04",
+      "excerpt": "Yapay zeka ve makinalar, 21. yüzyılın teknolojisinin en önemli parçalarından biri.",
+      "excerptEn": "AI and machines are among the most important parts of 21st century technology.",
+      "content": "Yapay zeka, insanların kendi algoritmalarını kullanarak çözmelerine izin veren bilgisayar sistemleridir. Makinalar ise, çok çeşitli işleri otomatikleştiren sistemlerdir.",
+      "contentEn": "AI refers to computer systems that solve problems using algorithms, while machines automate a wide variety of tasks.",
+      "image": "/blog/yapay-zeka-ve-makinalar.jpg",
+      "tag": "Genel"
+    },
+    {
+      "id": "6",
+      "slug": "dunyada-ve-turkiyede-makinalar",
+      "title": "Dünyada ve Türkiye’de Makinalar: Teknolojinin Gücü",
+      "titleEn": "Machines in the World and Turkey: The Power of Technology",
+      "date": "2025-03-01",
+      "tag": "Makale",
+      "excerpt": "Makinalar, çalışma sürelerini kısaltmak ve üretim kalitesini artırmak için kullanılan araçlardır.",
+      "excerptEn": "Machines are tools used to shorten working times and increase production quality.",
+      "content": "Dünyada ve Türkiye'de makinalar, insanların çalışma sürelerini kısaltmak, üretim süreçlerini hızlandırmak ve üretim kalitesini artırmak için kullanılan çok çeşitli araçların bir kümesidir. Teknolojinin gelişmesi, insanların üretim süreçlerini hızlandırmasına olanak sağlamıştır.",
+      "contentEn": "Machines accelerate production processes and improve quality worldwide and in Turkey.",
+      "image": "/blog/dunyada-ve-turkiyede-makinalar.jpg"
+    },
+    {
+      "id": "3",
+      "slug": "endustri-40-ve-dijitallesme",
+      "title": "Endüstri 4.0 ve Dijitalleşme: Geleceğe Yolculuk",
+      "titleEn": "Industry 4.0 and Digitalization: A Journey to the Future",
+      "date": "2025-02-28",
+      "excerpt": "Endüstri 4.0, sanayide dijital dönüşümün bir sonucu olarak ortaya çıkmıştır.",
+      "excerptEn": "Industry 4.0 has emerged as a result of digital transformation in industry.",
+      "content": "Endüstri 4.0, sanayide dijital dönüşümün bir sonucu olarak ortaya çıkmıştır. Üretim süreçlerindeki otomasyonun daha da ileriye götürülmesi ve akıllı fabrikaların oluşturulması hedeflenmektedir.",
+      "contentEn": "Industry 4.0 aims to further automate production processes and create smart factories.",
+      "image": "/blog/endustri-40-ve-dijitallesme.jpg",
+      "tag": "Makale"
+    },
+    {
+      "id": "4",
+      "slug": "paketleme-ve-ambalaj-makinalarinin-onemi",
+      "title": "Paketleme ve Ambalaj Makinalarının Önemi",
+      "titleEn": "The Importance of Packaging Machines",
+      "date": "2025-02-16",
+      "excerpt": "Paketleme makinaları, ürünlerin çeşitli şekillerde ambalajlanmasını sağlayan sistemlerdir.",
+      "excerptEn": "Packaging machines are systems that enable products to be packaged in various ways.",
+      "content": "Paketleme makinaları, ürünlerin çeşitli şekillerde ambalajlanmasını sağlayan, kolay kullanımlı ve verimli bir sistemdir. Bu makinalar, ürünlerin kutulara konması, kapatılması, sıkıştırılması, etiketlenmesi ve depolanması gibi çeşitli işlemleri gerçekleştirir.",
+      "contentEn": "Packaging machines perform operations such as boxing, sealing, labeling and storage of products.",
+      "image": "/blog/paketleme-ve-ambalaj-makinalarinin-onemi.jpg",
+      "tag": "Makale"
+    },
+    {
+      "id": "5",
+      "slug": "turkiyede-makina-sektorundeki-gelismeler",
+      "title": "Türkiye’de Makina Sektöründeki Gelişmeler",
+      "titleEn": "Developments in Turkey's Machinery Sector",
+      "date": "2025-02-01",
+      "tag": "Genel",
+      "excerpt": "Türkiye, makina sektöründe son yıllarda önemli gelişmelere sahne olmuştur.",
+      "excerptEn": "Turkey has seen significant developments in the machinery sector in recent years.",
+      "content": "Türkiye, makina sektöründe son yıllarda önemli gelişmelere sahne olmuştur. Makina sektörü, Türkiye ekonomisinin önemli bir parçasıdır ve ülkedeki gelişmelerin büyük bir kısmını etkilemektedir.",
+      "contentEn": "The machinery sector is an important part of the Turkish economy.",
+      "image": "/blog/turkiyede-makina-sektorundeki-gelismeler.jpg"
+    }
+  ]
+}
