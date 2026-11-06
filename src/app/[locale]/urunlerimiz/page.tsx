@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { auth } from "@/auth";
 import PageHeader from "@/components/PageHeader";
 import { CategoryCard } from "@/components/Cards";
 import ProductsScroller from "@/components/ProductsScroller";
@@ -10,6 +11,8 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
   const dict = getDict(locale);
   const categories = getCategories();
   const products = getProducts();
+  const session = await auth();
+  const isAdmin = session?.user?.email === "lux.studio.tr@gmail.com";
 
   return (
     <div className="pb-20">
@@ -17,7 +20,12 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
 
       {/* Categories */}
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-2xl font-bold tracking-tight mb-8">{dict.home.categoriesTitle}</h2>
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <h2 className="text-2xl font-bold tracking-tight">{dict.home.categoriesTitle}</h2>
+          <Link href={isAdmin ? "/admin/products" : "/admin/login"} className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold hover:bg-zinc-950 hover:text-white">
+            {isAdmin ? (locale === "en" ? "+ Add product" : "+ Ürün Ekle") : (locale === "en" ? "Admin sign in" : "Yönetici Girişi")}
+          </Link>
+        </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
         {categories.map((c) => (
           <CategoryCard
@@ -71,10 +79,12 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
       </div>
 
       {/* All products */}
-      <div className="max-w-7xl mx-auto px-4 mt-16 border-t border-zinc-200 pt-12">
-        <h2 className="text-2xl font-bold tracking-tight mb-8">{dict.home.allProducts}</h2>
-        <ProductsScroller products={products} locale={locale} cta={dict.products.viewProduct} />
-      </div>
+      {products.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 mt-16 border-t border-zinc-200 pt-12">
+          <h2 className="text-2xl font-bold tracking-tight mb-8">{dict.home.allProducts}</h2>
+          <ProductsScroller products={products} locale={locale} cta={dict.products.viewProduct} />
+        </div>
+      )}
 
       {/* CTA */}
       <div className="max-w-7xl mx-auto px-4 mt-16">

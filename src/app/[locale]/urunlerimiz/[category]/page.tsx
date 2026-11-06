@@ -28,11 +28,19 @@ export default async function CategoryPage({
         >
           ← {dict.products.backToCategories}
         </Link>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 mt-6">
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} locale={locale} cta={dict.products.viewProduct} />
-          ))}
-        </div>
+        {products.length > 0 ? (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 mt-6">
+            {products.map((p) => (
+              <ProductCard key={p.id} product={p} locale={locale} cta={dict.products.viewProduct} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50 px-6 py-16 text-center">
+            <h2 className="text-lg font-semibold">{locale === "en" ? "No products in this category yet" : "Bu kategoride henüz ürün bulunmuyor"}</h2>
+            <p className="mt-3 text-sm text-zinc-500">{locale === "en" ? "Contact us for information about our machines." : "Makinalarımız hakkında bilgi almak için bizimle iletişime geçebilirsiniz."}</p>
+            <Link href={`/${locale}/iletisim`} className="inline-block mt-6 rounded-lg bg-zinc-950 px-5 py-3 text-sm font-semibold text-white">{dict.nav.contact}</Link>
+          </div>
+        )}
 
         <div className="mt-16">
           <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-8">

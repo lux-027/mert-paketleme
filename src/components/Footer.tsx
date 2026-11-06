@@ -31,13 +31,13 @@ export default function Footer({ locale, dict }: { locale: string; dict: Dict })
 
   return (
     <footer className="bg-zinc-950 text-zinc-300">
-      <div className="max-w-7xl mx-auto px-4 py-16 grid gap-12 md:grid-cols-12">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-14 grid grid-cols-2 gap-x-6 gap-y-7 md:gap-10 md:grid-cols-12">
         {/* Brand */}
-        <div className="md:col-span-4">
+        <div className="col-span-2 md:col-span-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Mert Packing Machine" className="h-14 w-auto invert" />
-          <p className="text-zinc-400 mt-5 leading-relaxed text-sm max-w-xs">
-            {dict.home.aboutText}
+          <img src="/logo.png" alt="Mert Packing Machine" className="h-10 w-auto invert" />
+          <p className="text-zinc-400 mt-4 leading-relaxed text-xs md:text-sm max-w-sm">
+            {locale === "en" ? "Reliable filling, packaging and mixing solutions for your production." : "Üretiminiz için güvenilir dolum, paketleme ve karıştırma çözümleri."}
           </p>
           <div className="flex gap-3 mt-6">
             <a
@@ -70,10 +70,10 @@ export default function Footer({ locale, dict }: { locale: string; dict: Dict })
 
         {/* Quick menu */}
         <div className="md:col-span-2">
-          <div className="font-semibold text-white mb-5 uppercase tracking-wider text-xs">
+          <div className="font-semibold text-white mb-3 uppercase tracking-wider text-[11px] flex items-center gap-2 before:content-[''] before:w-1.5 before:h-1.5 before:rounded-full before:bg-zinc-400">
             {dict.footer.quickMenu}
           </div>
-          <ul className="space-y-3 text-sm">
+          <ul className="space-y-2 text-xs md:text-sm">
             <li><Link href={`/${locale}`} className="text-zinc-400 hover:text-white transition-colors">{dict.nav.home}</Link></li>
             <li><Link href={`/${locale}/hakkimizda`} className="text-zinc-400 hover:text-white transition-colors">{dict.nav.about}</Link></li>
             <li><Link href={`/${locale}/misyon-vizyon`} className="text-zinc-400 hover:text-white transition-colors">{dict.nav.mission}</Link></li>
@@ -86,10 +86,10 @@ export default function Footer({ locale, dict }: { locale: string; dict: Dict })
 
         {/* Categories */}
         <div className="md:col-span-3">
-          <div className="font-semibold text-white mb-5 uppercase tracking-wider text-xs">
+          <div className="font-semibold text-white mb-3 uppercase tracking-wider text-[11px] flex items-center gap-2 before:content-[''] before:w-1.5 before:h-1.5 before:rounded-full before:bg-zinc-400">
             {dict.home.categoriesTitle}
           </div>
-          <ul className="space-y-3 text-sm">
+          <ul className="space-y-2 text-xs md:text-sm">
             {categories.map((c) => (
               <li key={c.id}>
                 <Link
@@ -104,11 +104,11 @@ export default function Footer({ locale, dict }: { locale: string; dict: Dict })
         </div>
 
         {/* Contact */}
-        <div className="md:col-span-3">
-          <div className="font-semibold text-white mb-5 uppercase tracking-wider text-xs">
+        <div className="col-span-2 md:col-span-3 border-t border-zinc-800 pt-5 md:border-0 md:pt-0">
+          <div className="font-semibold text-white mb-3 uppercase tracking-wider text-[11px] flex items-center gap-2 before:content-[''] before:w-1.5 before:h-1.5 before:rounded-full before:bg-zinc-400">
             {dict.footer.contact}
           </div>
-          <ul className="space-y-4 text-sm text-zinc-400">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-3 text-xs md:text-sm text-zinc-400">
             <li className="flex gap-3">
               {icons.pin}
               <span>{site.address}</span>
@@ -136,7 +136,7 @@ export default function Footer({ locale, dict }: { locale: string; dict: Dict })
       <div className="border-t border-zinc-800/70 py-5">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-500">
           <span>© {site.name} — {dict.footer.rights}</span>
-          <a href="/admin" className="hover:text-zinc-300 transition-colors">Admin</a>
+          <Link href="/admin" className="hover:text-zinc-300 transition-colors">Admin</Link>
         </div>
       </div>
     </footer>

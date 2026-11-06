@@ -1,39 +1,39 @@
 {
   "categories": [
     {
-      "id": "5",
-      "slug": "manuel-dolum-makinalari",
-      "name": "Manuel Dolum Makinaları",
-      "nameEn": "Manual Filling Machines",
-      "image": ""
-    },
-    {
       "id": "6",
       "slug": "tam-otomatik-dolum-makinalari",
       "name": "Tam Otomatik Dolum Makinaları",
       "nameEn": "Fully Automatic Filling Machines",
-      "image": ""
+      "image": "/tam-otomatik-dolum.webp"
+    },
+    {
+      "id": "5",
+      "slug": "manuel-dolum-makinalari",
+      "name": "Manuel Dolum Makinaları",
+      "nameEn": "Manual Filling Machines",
+      "image": "/manuel-dolum.webp"
     },
     {
       "id": "7",
       "slug": "sivi-dolum-makinalari",
       "name": "Sıvı Dolum Makinaları",
       "nameEn": "Liquid Filling Machines",
-      "image": ""
+      "image": "/sivi-dolum.webp"
     },
     {
       "id": "8",
       "slug": "etiket-baski-makinalari",
       "name": "Etiket Baskı Makinaları",
       "nameEn": "Label Printing Machines",
-      "image": ""
+      "image": "/etiket-baski.webp"
     },
     {
       "id": "9",
       "slug": "mikser-karistiricilar",
       "name": "Mikser Karıştırıcılar",
       "nameEn": "Mixers & Blenders",
-      "image": ""
+      "image": "/mikser-karistirici.webp"
     }
   ],
   "products": [],
@@ -48,7 +48,7 @@
       "excerptEn": "Auger packaging machines speed up product packaging processes in production.",
       "content": "Vidalı paketleme makinaları, üretim süreçlerinde çok çeşitli malzemeleri kullanarak ürünlerin kutulama ve ambalajlama işlemlerini hızlandırır. Bu makinalar, ürünlerin kutulama ve ambalajlama işlemlerinde kullanılan malzemeler arasında önemli bir yer tutar.",
       "contentEn": "Auger packaging machines accelerate boxing and packaging of products using a wide range of materials in production processes.",
-      "image": "/products/vidali-paketleme-makinasi.webp",
+      "image": "/blog/vidali-paketleme-makinalari.webp",
       "tag": "Makale"
     },
     {
@@ -61,7 +61,7 @@
       "excerptEn": "AI and machines are among the most important parts of 21st century technology.",
       "content": "Yapay zeka, insanların kendi algoritmalarını kullanarak çözmelerine izin veren bilgisayar sistemleridir. Makinalar ise, çok çeşitli işleri otomatikleştiren sistemlerdir.",
       "contentEn": "AI refers to computer systems that solve problems using algorithms, while machines automate a wide variety of tasks.",
-      "image": "/products/4-terazili-linear-dikey-paketleme-makinasi.webp",
+      "image": "/blog/yapay-zeka-ve-makinalar.webp",
       "tag": "Genel"
     },
     {
@@ -75,7 +75,7 @@
       "excerptEn": "Machines are tools used to shorten working times and increase production quality.",
       "content": "Dünyada ve Türkiye'de makinalar, insanların çalışma sürelerini kısaltmak, üretim süreçlerini hızlandırmak ve üretim kalitesini artırmak için kullanılan çok çeşitli araçların bir kümesidir. Teknolojinin gelişmesi, insanların üretim süreçlerini hızlandırmasına olanak sağlamıştır.",
       "contentEn": "Machines accelerate production processes and improve quality worldwide and in Turkey.",
-      "image": "/products/duz-pvc-bantli-konveyor.jpeg"
+      "image": "/blog/dunyada-ve-turkiyede-makinalar.webp"
     },
     {
       "id": "3",
@@ -87,7 +87,7 @@
       "excerptEn": "Industry 4.0 has emerged as a result of digital transformation in industry.",
       "content": "Endüstri 4.0, sanayide dijital dönüşümün bir sonucu olarak ortaya çıkmıştır. Üretim süreçlerindeki otomasyonun daha da ileriye götürülmesi ve akıllı fabrikaların oluşturulması hedeflenmektedir.",
       "contentEn": "Industry 4.0 aims to further automate production processes and create smart factories.",
-      "image": "/products/asansorlu-dikey-paketleme-makinasi.webp",
+      "image": "/blog/endustri-40-ve-dijitallesme.webp",
       "tag": "Makale"
     },
     {
@@ -100,7 +100,7 @@
       "excerptEn": "Packaging machines are systems that enable products to be packaged in various ways.",
       "content": "Paketleme makinaları, ürünlerin çeşitli şekillerde ambalajlanmasını sağlayan, kolay kullanımlı ve verimli bir sistemdir. Bu makinalar, ürünlerin kutulara konması, kapatılması, sıkıştırılması, etiketlenmesi ve depolanması gibi çeşitli işlemleri gerçekleştirir.",
       "contentEn": "Packaging machines perform operations such as boxing, sealing, labeling and storage of products.",
-      "image": "/products/2-terazili-linear-paketleme-makinasi.webp",
+      "image": "/blog/paketleme-ve-ambalaj-makinalarinin-onemi.webp",
       "tag": "Makale"
     },
     {
@@ -114,7 +114,7 @@
       "excerptEn": "Turkey has seen significant developments in the machinery sector in recent years.",
       "content": "Türkiye, makina sektöründe son yıllarda önemli gelişmelere sahne olmuştur. Makina sektörü, Türkiye ekonomisinin önemli bir parçasıdır ve ülkedeki gelişmelerin büyük bir kısmını etkilemektedir.",
       "contentEn": "The machinery sector is an important part of the Turkish economy.",
-      "image": "/products/urun-tasima-helezonu.png"
+      "image": "/blog/turkiyede-makina-sektorundeki-gelismeler.webp"
     }
   ]
 }

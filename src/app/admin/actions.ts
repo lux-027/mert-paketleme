@@ -14,7 +14,7 @@ import {
 
 async function requireAdmin() {
   const session = await auth();
-  if (!session) throw new Error("Unauthorized");
+  if (session?.user?.email !== "lux.studio.tr@gmail.com") throw new Error("Unauthorized");
 }
 
 async function saveUpload(file: File | null): Promise<string | null> {

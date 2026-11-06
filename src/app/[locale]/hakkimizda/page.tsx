@@ -10,15 +10,19 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <PageHeader title={dict.about.title} />
       <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
         <div>
-          <p className="text-zinc-600 leading-relaxed text-lg">{dict.about.text}</p>
-          <ul className="mt-8 space-y-3">
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6 md:p-8">
+            <div className="text-xs uppercase tracking-[0.2em] text-zinc-400 font-semibold mb-4">{dict.about.title}</div>
+            <p className="text-zinc-600 leading-relaxed">{dict.about.text}</p>
+          </div>
+          <div className="mt-5 grid sm:grid-cols-3 gap-4">
             {dict.home.features.map((f) => (
-              <li key={f.title} className="flex gap-3">
-                <span className="w-2 h-2 bg-zinc-950 rounded-full mt-2 shrink-0" />
-                <span><strong>{f.title}:</strong> {f.desc}</span>
-              </li>
+              <div key={f.title} className="rounded-2xl border border-zinc-200 bg-white p-5">
+                <div className="w-8 h-1 rounded bg-zinc-950 mb-4" />
+                <div className="font-semibold">{f.title}</div>
+                <div className="mt-2 text-sm leading-relaxed text-zinc-500">{f.desc}</div>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
         <div className="rounded-2xl overflow-hidden border border-zinc-800">
           <RobotIllustration className="w-full h-full" />

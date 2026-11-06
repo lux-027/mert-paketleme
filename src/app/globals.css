@@ -6,18 +6,43 @@
 }
 
 @keyframes flagwave {
-  0%,
-  100% {
-    transform: perspective(60px) rotateY(-14deg) skewY(-2deg);
+  0%, 100% {
+    transform: translateY(calc(var(--wave-height) * -1)) scaleY(0.98);
+    filter: brightness(0.83);
   }
   50% {
-    transform: perspective(60px) rotateY(14deg) skewY(2deg);
+    transform: translateY(var(--wave-height)) scaleY(1.02);
+    filter: brightness(1.12);
   }
 }
 
 .flag-wave {
-  animation: flagwave 1.8s ease-in-out infinite;
-  transform-origin: left center;
+  display: inline-flex;
+  width: 36px;
+  height: 24px;
+  flex-shrink: 0;
+  align-items: center;
+  filter: drop-shadow(0 1px 1px #0003);
+}
+
+.flag-strip {
+  display: block;
+  width: 3px;
+  height: 24px;
+  flex-shrink: 0;
+  animation: flagwave 2.4s ease-in-out infinite;
+}
+
+.flag-strip svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flag-strip {
+    animation: none;
+  }
 }
 
 body {

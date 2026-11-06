@@ -10,7 +10,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     signIn({ profile }) {
-      return profile?.email === ALLOWED_EMAIL;
+      return profile?.email === ALLOWED_EMAIL && profile?.email_verified === true;
     },
     authorized({ auth, request }) {
       const isAdmin = request.nextUrl.pathname.startsWith("/admin");
