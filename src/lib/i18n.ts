@@ -6,11 +6,12 @@ export const site = {
   name: "Mert Paketleme Makinaları",
   phone: "+90 530 168 57 27",
   email: "info@mertpaketleme.com",
-  address: "Örnek Sanayi Sitesi 60042 Nolu Cad. No:25 Şehitkamil / Gaziantep",
+  address: "Sanayi Mah. 60042. Cad. No:23/A, 27110 Şehitkamil / Gaziantep",
   mapsEmbed:
-    "https://www.google.com/maps?q=Örnek+Sanayi+Sitesi+60042+Nolu+Cadde+No:25,+Şehitkamil,+Gaziantep&z=17&output=embed",
+    "https://www.google.com/maps?q=Mert+Paketleme+Makinalar%C4%B1,+3CCM%2BCP,+60042.+Cd.+23a,+27110+%C5%9Eehitkamil,+Gaziantep&z=17&output=embed",
   hours: "Pzt - Cmt: 09:00 - 19:00",
-  mapsUrl: "https://goo.gl/maps/c2bhuRHcxqNftdHW9",
+  mapsUrl:
+    "https://www.google.com/maps/search/?api=1&query=Mert+Paketleme+Makinalar%C4%B1+3CCM%2BCP+%C5%9Eehitkamil+Gaziantep",
 };
 
 const tr = {
