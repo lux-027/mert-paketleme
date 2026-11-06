@@ -17,8 +17,8 @@
     {
       "id": "3",
       "slug": "konveyor-ve-helezon",
-      "name": "Konveyör ve Helezonlar",
-      "nameEn": "Conveyors & Augers",
+      "name": "Konveyör Bantlar ve Dolum Helezonları",
+      "nameEn": "Conveyor Belts & Filling Augers",
       "image": "/products/urun-tasima-helezonu.png"
     },
     {
@@ -27,6 +27,41 @@
       "name": "Diğer Cihazlar",
       "nameEn": "Other Devices",
       "image": "/products/vidali-guadro-dolum-paketleme-makinasi.jpeg"
+    },
+    {
+      "id": "5",
+      "slug": "manuel-dolum-makinalari",
+      "name": "Manuel Dolum Makinaları",
+      "nameEn": "Manual Filling Machines",
+      "image": ""
+    },
+    {
+      "id": "6",
+      "slug": "tam-otomatik-dolum-makinalari",
+      "name": "Tam Otomatik Dolum Makinaları",
+      "nameEn": "Fully Automatic Filling Machines",
+      "image": ""
+    },
+    {
+      "id": "7",
+      "slug": "sivi-dolum-makinalari",
+      "name": "Sıvı Dolum Makinaları",
+      "nameEn": "Liquid Filling Machines",
+      "image": ""
+    },
+    {
+      "id": "8",
+      "slug": "etiket-baski-makinalari",
+      "name": "Etiket Baskı Makinaları",
+      "nameEn": "Label Printing Machines",
+      "image": ""
+    },
+    {
+      "id": "9",
+      "slug": "mikser-karistiricilar",
+      "name": "Mikser Karıştırıcılar",
+      "nameEn": "Mixers & Blenders",
+      "image": ""
     }
   ],
   "products": [
