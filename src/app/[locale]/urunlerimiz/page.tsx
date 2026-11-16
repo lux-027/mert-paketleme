@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { auth } from "@/auth";
+import { auth, ALLOWED_EMAILS } from "@/auth";
 import PageHeader from "@/components/PageHeader";
 import { CategoryCard } from "@/components/Cards";
 import ProductsScroller from "@/components/ProductsScroller";
@@ -12,7 +12,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
   const categories = getCategories();
   const products = getProducts();
   const session = await auth();
-  const isAdmin = session?.user?.email === "lux.studio.tr@gmail.com";
+  const isAdmin = !!session?.user?.email && ALLOWED_EMAILS.includes(session.user.email);
 
   return (
     <div className="pb-20">

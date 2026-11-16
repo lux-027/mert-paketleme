@@ -1,7 +1,11 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 
-const ALLOWED_EMAIL = "lux.studio.tr@gmail.com";
+export const ALLOWED_EMAILS = [
+  "lux.studio.tr@gmail.com",
+  "emredrk109@gmail.com",
+  "mertpaketleme@gmail.com",
+];
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [Google],
@@ -10,7 +14,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     signIn({ profile }) {
-      return profile?.email === ALLOWED_EMAIL && profile?.email_verified === true;
+      return !!profile?.email && ALLOWED_EMAILS.includes(profile.email) && profile?.email_verified === true;
     },
     authorized({ auth, request }) {
       const isAdmin = request.nextUrl.pathname.startsWith("/admin");

@@ -3,7 +3,7 @@
 import fs from "fs";
 import path from "path";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
+import { auth, ALLOWED_EMAILS } from "@/auth";
 import {
   saveCategory,
   deleteCategory,
@@ -14,7 +14,7 @@ import {
 
 async function requireAdmin() {
   const session = await auth();
-  if (session?.user?.email !== "lux.studio.tr@gmail.com") throw new Error("Unauthorized");
+  if (!session?.user?.email || !ALLOWED_EMAILS.includes(session.user.email)) throw new Error("Unauthorized");
 }
 
 async function saveUpload(file: File | null): Promise<string | null> {
