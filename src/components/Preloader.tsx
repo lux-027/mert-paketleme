@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const MIN_DURATION = 5000;
 const TIP_INTERVAL = 1800;
@@ -12,6 +12,16 @@ const tipsTR = [
   "Etiket baskı kafası hizalanıyor…",
   "Mikser karıştırıcı devir ayarı yapılıyor…",
   "Paketleme hattı son kontrolden geçiyor…",
+  "Paslanmaz gövde panelleri yerleştiriliyor…",
+  "Pnömatik piston basıncı ayarlanıyor…",
+  "Sensörler ürün akışına kalibre ediliyor…",
+  "Hazne seviye kontrolü yapılıyor…",
+  "Dozajlama valfleri test ediliyor…",
+  "Servo motorlar referans pozisyonuna alınıyor…",
+  "Üretim hattı güvenlik protokolleri kontrol ediliyor…",
+  "Ambalaj filmi rulosu takılıyor…",
+  "Soğutma fanları devreye alınıyor…",
+  "Operatör paneli başlatılıyor…",
 ];
 
 const tipsEN = [
@@ -21,6 +31,16 @@ const tipsEN = [
   "Aligning the label print head…",
   "Setting mixer agitator speed…",
   "Final checks on the packaging line…",
+  "Mounting stainless body panels…",
+  "Adjusting pneumatic piston pressure…",
+  "Calibrating sensors to product flow…",
+  "Checking hopper level control…",
+  "Testing dosing valves…",
+  "Homing servo motors to reference position…",
+  "Verifying production line safety protocols…",
+  "Loading the packaging film roll…",
+  "Bringing cooling fans online…",
+  "Starting the operator panel…",
 ];
 
 export default function Preloader() {
@@ -52,7 +72,11 @@ export default function Preloader() {
 
   const isEn = typeof window !== "undefined" && window.location.pathname.startsWith("/en");
   const tips = isEn ? tipsEN : tipsTR;
-  const tip = tips[tipIndex % tips.length];
+  const shuffled = useRef<number[]>([]);
+  if (shuffled.current.length === 0) {
+    shuffled.current = tips.map((_, i) => i).sort(() => Math.random() - 0.5);
+  }
+  const tip = tips[shuffled.current[tipIndex % tips.length]];
 
   return (
     <div
