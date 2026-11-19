@@ -3,6 +3,7 @@ import { auth, ALLOWED_EMAILS } from "@/auth";
 import PageHeader from "@/components/PageHeader";
 import { CategoryCard } from "@/components/Cards";
 import ProductsScroller from "@/components/ProductsScroller";
+import Reveal from "@/components/Reveal";
 import { getDict, site } from "@/lib/i18n";
 import { getCategories, getProducts } from "@/lib/store";
 
@@ -34,19 +35,21 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
           </Link>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-        {categories.map((c) => (
-          <CategoryCard
-            key={c.id}
-            category={c}
-            locale={locale}
-            count={products.filter((p) => p.categoryId === c.id).length}
-          />
+        {categories.map((c, i) => (
+          <Reveal key={c.id} delay={i * 80} className="h-full">
+            <CategoryCard
+              category={c}
+              locale={locale}
+              count={products.filter((p) => p.categoryId === c.id).length}
+            />
+          </Reveal>
         ))}
         </div>
       </div>
 
       {/* Banner */}
       <div className="max-w-7xl mx-auto px-4 mt-16">
+        <Reveal>
         <div className="relative overflow-hidden rounded-2xl bg-zinc-950 text-white px-10 py-14">
           <div
             className="absolute inset-0 opacity-[0.06]"
@@ -92,6 +95,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
             </div>
           </div>
         </div>
+        </Reveal>
       </div>
 
       {/* All products */}
@@ -104,6 +108,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
 
       {/* CTA */}
       <div className="max-w-7xl mx-auto px-4 mt-16">
+        <Reveal>
         <div className="bg-zinc-950 text-white rounded-2xl px-10 py-12 flex flex-col md:flex-row md:items-center gap-8">
           <div className="flex-1">
             <h3 className="text-xl md:text-2xl font-bold tracking-tight">{dict.home.ctaTitle}</h3>
@@ -124,6 +129,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
             </Link>
           </div>
         </div>
+        </Reveal>
       </div>
     </div>
   );

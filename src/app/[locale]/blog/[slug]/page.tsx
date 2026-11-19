@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDict } from "@/lib/i18n";
 import { getPost, getPosts } from "@/lib/store";
+import Reveal from "@/components/Reveal";
 
 export default async function PostPage({
   params,
@@ -34,24 +35,26 @@ export default async function PostPage({
 
       {post.image && (
         <div className="max-w-3xl mx-auto px-4 -mt-8">
-          <div className="bg-zinc-50 border border-zinc-200 rounded-2xl aspect-[16/8] flex items-center justify-center p-8">
+          <Reveal className="bg-zinc-50 border border-zinc-200 rounded-2xl aspect-[16/8] flex items-center justify-center p-8">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={post.image} alt={title} className="max-h-full object-contain" />
-          </div>
+          </Reveal>
         </div>
       )}
 
       <div className="max-w-3xl mx-auto px-4 mt-10">
-        <p className="text-zinc-600 leading-relaxed text-lg whitespace-pre-line">{content}</p>
+        <Reveal delay={100}>
+          <p className="text-zinc-600 leading-relaxed text-lg whitespace-pre-line">{content}</p>
+        </Reveal>
       </div>
 
       {/* Other posts */}
       <div className="max-w-7xl mx-auto px-4 mt-16 border-t border-zinc-200 pt-10">
         <h2 className="text-xl font-bold tracking-tight mb-6">{dict.home.blogTitle}</h2>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
-          {others.map((p) => (
+          {others.map((p, i) => (
+            <Reveal key={p.id} delay={i * 80} className="h-full">
             <Link
-              key={p.id}
               href={`/${locale}/blog/${p.slug}`}
               className="border border-zinc-200 rounded-2xl p-6 hover:shadow-lg transition-shadow"
             >
@@ -63,6 +66,7 @@ export default async function PostPage({
                 {dict.blog.readMore}
               </div>
             </Link>
+            </Reveal>
           ))}
         </div>
       </div>

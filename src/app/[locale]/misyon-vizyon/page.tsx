@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
+import Reveal from "@/components/Reveal";
 import { getDict, site } from "@/lib/i18n";
 
 const valueIcons = [
@@ -23,7 +24,7 @@ export default async function MissionPage({ params }: { params: Promise<{ locale
       {/* Mission & Vision */}
       <div className="max-w-7xl mx-auto px-4 grid gap-6 md:grid-cols-2">
         {/* Mission — dark card */}
-        <div className="relative overflow-hidden rounded-2xl bg-zinc-950 text-white p-10 min-h-[320px] flex flex-col justify-between group">
+        <Reveal className="relative overflow-hidden rounded-2xl bg-zinc-950 text-white p-10 min-h-[320px] flex flex-col justify-between group">
           <div
             className="absolute inset-0 opacity-[0.06]"
             style={{
@@ -50,10 +51,10 @@ export default async function MissionPage({ params }: { params: Promise<{ locale
             <div className="w-12 h-1 bg-white rounded" />
             <div className="w-3 h-3 rounded-full bg-white" />
           </div>
-        </div>
+        </Reveal>
 
         {/* Vision — light card */}
-        <div className="relative overflow-hidden rounded-2xl border-2 border-zinc-950 bg-white p-10 min-h-[320px] flex flex-col justify-between group">
+        <Reveal delay={150} className="relative overflow-hidden rounded-2xl border-2 border-zinc-950 bg-white p-10 min-h-[320px] flex flex-col justify-between group">
           <div
             className="absolute inset-0 opacity-[0.05]"
             style={{
@@ -80,7 +81,7 @@ export default async function MissionPage({ params }: { params: Promise<{ locale
             <div className="w-12 h-1 bg-zinc-950 rounded" />
             <div className="w-3 h-3 rounded-full border-2 border-zinc-950" />
           </div>
-        </div>
+        </Reveal>
       </div>
 
       {/* Values */}
@@ -90,33 +91,32 @@ export default async function MissionPage({ params }: { params: Promise<{ locale
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
           {dict.mission.values.map((v, i) => (
-            <div
-              key={v.title}
-              className="border border-zinc-200 rounded-2xl p-6 hover:border-zinc-950 hover:shadow-lg transition-all"
-            >
-              <div className="text-zinc-950">{valueIcons[i]}</div>
-              <div className="font-semibold mt-4">{v.title}</div>
-              <p className="text-sm text-zinc-500 mt-2 leading-relaxed">{v.desc}</p>
-            </div>
+            <Reveal key={v.title} delay={i * 90} className="h-full">
+              <div className="border border-zinc-200 rounded-2xl p-6 hover:border-zinc-950 hover:shadow-lg transition-all h-full">
+                <div className="text-zinc-950">{valueIcons[i]}</div>
+                <div className="font-semibold mt-4">{v.title}</div>
+                <p className="text-sm text-zinc-500 mt-2 leading-relaxed">{v.desc}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </div>
 
       {/* Stats strip */}
       <div className="max-w-7xl mx-auto px-4 mt-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-zinc-200 border border-zinc-200 rounded-2xl bg-white">
+        <Reveal className="grid grid-cols-2 md:grid-cols-4 divide-x divide-zinc-200 border border-zinc-200 rounded-2xl bg-white">
           {dict.home.stats.map((s) => (
             <div key={s.label} className="px-6 py-8 text-center">
               <div className="text-3xl font-bold tracking-tight">{s.value}</div>
               <div className="text-xs text-zinc-500 mt-2 uppercase tracking-wider">{s.label}</div>
             </div>
           ))}
-        </div>
+        </Reveal>
       </div>
 
       {/* CTA */}
       <div className="max-w-7xl mx-auto px-4 mt-16">
-        <div className="bg-zinc-950 text-white rounded-2xl px-10 py-12 flex flex-col md:flex-row md:items-center gap-8">
+        <Reveal className="bg-zinc-950 text-white rounded-2xl px-10 py-12 flex flex-col md:flex-row md:items-center gap-8">
           <div className="flex-1">
             <h3 className="text-xl md:text-2xl font-bold tracking-tight">{dict.home.ctaTitle}</h3>
             <p className="text-zinc-400 mt-3">{dict.home.ctaText}</p>
@@ -135,7 +135,7 @@ export default async function MissionPage({ params }: { params: Promise<{ locale
               {dict.hero.cta2}
             </Link>
           </div>
-        </div>
+        </Reveal>
       </div>
     </div>
   );

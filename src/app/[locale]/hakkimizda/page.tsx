@@ -1,5 +1,6 @@
 import PageHeader from "@/components/PageHeader";
 import RobotIllustration from "@/components/RobotIllustration";
+import Reveal from "@/components/Reveal";
 import { getDict } from "@/lib/i18n";
 
 const industryImages = [
@@ -17,37 +18,38 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <PageHeader title={dict.about.title} />
       <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
         <div>
-          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6 md:p-8">
+          <Reveal className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6 md:p-8">
             <div className="text-xs uppercase tracking-[0.2em] text-zinc-400 font-semibold mb-4">{dict.about.title}</div>
             <p className="text-zinc-600 leading-relaxed">{dict.about.text}</p>
-          </div>
+          </Reveal>
           <div className="mt-5 grid sm:grid-cols-3 gap-4">
-            {dict.home.features.map((f) => (
-              <div key={f.title} className="rounded-2xl border border-zinc-200 bg-white p-5">
-                <div className="w-8 h-1 rounded bg-zinc-950 mb-4" />
-                <div className="font-semibold">{f.title}</div>
-                <div className="mt-2 text-sm leading-relaxed text-zinc-500">{f.desc}</div>
-              </div>
+            {dict.home.features.map((f, i) => (
+              <Reveal key={f.title} delay={i * 90}>
+                <div className="rounded-2xl border border-zinc-200 bg-white p-5 h-full">
+                  <div className="w-8 h-1 rounded bg-zinc-950 mb-4" />
+                  <div className="font-semibold">{f.title}</div>
+                  <div className="mt-2 text-sm leading-relaxed text-zinc-500">{f.desc}</div>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
-        <div className="rounded-2xl overflow-hidden border border-zinc-800">
+        <Reveal delay={150} className="rounded-2xl overflow-hidden border border-zinc-800">
           <RobotIllustration className="w-full h-full" />
-        </div>
+        </Reveal>
       </div>
 
       {/* Stats */}
       <div className="max-w-7xl mx-auto px-4 mt-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-          {dict.home.stats.map((s) => (
-            <div
-              key={s.label}
-              className="border border-zinc-200 rounded-2xl px-6 py-8 text-center bg-white hover:border-zinc-950 transition-colors"
-            >
-              <div className="text-4xl font-bold tracking-tight">{s.value}</div>
-              <div className="w-8 h-0.5 bg-zinc-950 rounded mx-auto mt-3" />
-              <div className="text-xs text-zinc-500 mt-3 uppercase tracking-wider">{s.label}</div>
-            </div>
+          {dict.home.stats.map((s, i) => (
+            <Reveal key={s.label} delay={i * 80}>
+              <div className="border border-zinc-200 rounded-2xl px-6 py-8 text-center bg-white hover:border-zinc-950 transition-colors h-full">
+                <div className="text-4xl font-bold tracking-tight">{s.value}</div>
+                <div className="w-8 h-0.5 bg-zinc-950 rounded mx-auto mt-3" />
+                <div className="text-xs text-zinc-500 mt-3 uppercase tracking-wider">{s.label}</div>
+              </div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -57,10 +59,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         <h2 className="text-2xl font-bold tracking-tight mb-8">{dict.home.industriesTitle}</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
           {dict.home.industries.map((t, i) => (
-            <div
-              key={t}
-              className="group relative aspect-[4/3] rounded-2xl overflow-hidden border border-zinc-200"
-            >
+            <Reveal key={t} delay={i * 90} className="group relative aspect-[4/3] rounded-2xl overflow-hidden border border-zinc-200">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={industryImages[i]}
@@ -73,7 +72,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                 <div className="text-white font-semibold leading-tight">{t}</div>
                 <div className="text-xs text-zinc-300 mt-1">{dict.home.industriesText}</div>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageHeader from "@/components/PageHeader";
 import { ProductCard, CategoryCard } from "@/components/Cards";
+import Reveal from "@/components/Reveal";
 import { getDict } from "@/lib/i18n";
 import { getCategories, getCategory, getProducts } from "@/lib/store";
 
@@ -30,8 +31,10 @@ export default async function CategoryPage({
         </Link>
         {products.length > 0 ? (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 mt-6">
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} locale={locale} cta={dict.products.viewProduct} />
+            {products.map((p, i) => (
+              <Reveal key={p.id} delay={i * 80} className="h-full">
+                <ProductCard product={p} locale={locale} cta={dict.products.viewProduct} />
+              </Reveal>
             ))}
           </div>
         ) : (
@@ -54,8 +57,10 @@ export default async function CategoryPage({
               </div>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
-              {others.map((c) => (
-                <CategoryCard key={c.id} category={c} locale={locale} />
+              {others.map((c, i) => (
+                <Reveal key={c.id} delay={i * 80} className="h-full">
+                  <CategoryCard category={c} locale={locale} />
+                </Reveal>
               ))}
             </div>
           </div>

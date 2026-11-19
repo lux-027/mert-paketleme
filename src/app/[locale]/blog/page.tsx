@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
+import Reveal from "@/components/Reveal";
 import { getDict } from "@/lib/i18n";
 import { getPosts } from "@/lib/store";
 
@@ -18,6 +19,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
       <div className="max-w-7xl mx-auto px-4 pb-20">
         {/* Featured post */}
         {featured && (
+          <Reveal>
           <Link
             href={`/${locale}/blog/${featured.slug}`}
             className="group relative grid md:grid-cols-5 rounded-2xl overflow-hidden bg-zinc-950 text-white mb-10"
@@ -54,13 +56,14 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
               </div>
             </div>
           </Link>
+          </Reveal>
         )}
 
         {/* Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
-          {posts.map((post) => (
+          {posts.map((post, i) => (
+            <Reveal key={post.id} delay={i * 80} className="h-full">
             <Link
-              key={post.id}
               href={`/${locale}/blog/${post.slug}`}
               className="group bg-white border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-lg hover:border-zinc-300 transition-all flex flex-col"
             >
@@ -95,6 +98,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
                 </div>
               </div>
             </Link>
+            </Reveal>
           ))}
         </div>
       </div>

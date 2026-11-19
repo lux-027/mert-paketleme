@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getDict } from "@/lib/i18n";
 import { getCategories, getProducts, getPosts } from "@/lib/store";
 import { CategoryCard, ProductCard } from "@/components/Cards";
+import Reveal from "@/components/Reveal";
 import TechIllustration from "@/components/TechIllustration";
 import { site } from "@/lib/i18n";
 
@@ -46,6 +47,7 @@ export default async function HomePage({
           className="absolute -right-24 top-1/2 -translate-y-1/2 h-[480px] w-[480px] object-contain opacity-15 invert pointer-events-none"
         />
         <div className="relative max-w-7xl mx-auto px-4 py-14 md:py-28">
+          <Reveal>
           <div className="inline-flex items-center gap-2 border border-zinc-700 rounded-full px-4 py-1.5 text-xs text-zinc-300 tracking-wide uppercase">
             <span className="w-1.5 h-1.5 bg-white rounded-full" />
             {site.name}
@@ -71,29 +73,29 @@ export default async function HomePage({
 
           {/* Stats */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-zinc-800 pt-10 max-w-3xl">
-            {dict.home.stats.map((s) => (
-              <div key={s.label}>
+            {dict.home.stats.map((s, i) => (
+              <Reveal key={s.label} delay={i * 100}>
                 <div className="text-2xl md:text-3xl font-bold">{s.value}</div>
                 <div className="text-xs text-zinc-500 mt-1 uppercase tracking-wide">{s.label}</div>
-              </div>
+              </Reveal>
             ))}
           </div>
+          </Reveal>
         </div>
       </section>
 
       {/* Features */}
       <section className="max-w-7xl mx-auto px-4 py-12 md:py-20">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight">{dict.home.featuresTitle}</h2>
+        <Reveal><h2 className="text-2xl md:text-3xl font-bold tracking-tight">{dict.home.featuresTitle}</h2></Reveal>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mt-10">
           {dict.home.features.map((f, i) => (
-            <div
-              key={f.title}
-              className="border border-zinc-200 rounded-2xl p-6 hover:border-zinc-950 hover:shadow-lg transition-all"
-            >
-              <div className="text-zinc-950">{featureIcons[i]}</div>
-              <div className="font-semibold mt-4">{f.title}</div>
-              <p className="text-sm text-zinc-500 mt-2 leading-relaxed">{f.desc}</p>
-            </div>
+            <Reveal key={f.title} delay={i * 90} className="h-full">
+              <div className="border border-zinc-200 rounded-2xl p-6 hover:border-zinc-950 hover:shadow-lg transition-all h-full">
+                <div className="text-zinc-950">{featureIcons[i]}</div>
+                <div className="font-semibold mt-4">{f.title}</div>
+                <p className="text-sm text-zinc-500 mt-2 leading-relaxed">{f.desc}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -106,13 +108,12 @@ export default async function HomePage({
             <p className="text-sm text-zinc-400 mt-2">{dict.home.industriesText}</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1">
-            {dict.home.industries.map((t) => (
-              <div
-                key={t}
-                className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-4 text-sm font-medium text-center text-zinc-200 hover:border-zinc-400 transition-colors"
-              >
-                {t}
-              </div>
+            {dict.home.industries.map((t, i) => (
+              <Reveal key={t} delay={i * 90}>
+                <div className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-4 text-sm font-medium text-center text-zinc-200 hover:border-zinc-400 transition-colors">
+                  {t}
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -127,8 +128,10 @@ export default async function HomePage({
           </Link>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-          {categories.map((c) => (
-            <CategoryCard key={c.id} category={c} locale={locale} />
+          {categories.map((c, i) => (
+            <Reveal key={c.id} delay={i * 80} className="h-full">
+              <CategoryCard category={c} locale={locale} />
+            </Reveal>
           ))}
         </div>
       </section>
@@ -143,8 +146,10 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
-            {featured.map((p) => (
-              <ProductCard key={p.id} product={p} locale={locale} cta={dict.products.viewProduct} />
+            {featured.map((p, i) => (
+              <Reveal key={p.id} delay={i * 80} className="h-full">
+                <ProductCard product={p} locale={locale} cta={dict.products.viewProduct} />
+              </Reveal>
             ))}
           </div>
         </div>
@@ -153,10 +158,10 @@ export default async function HomePage({
       {/* CTA band */}
       <section className="bg-zinc-950 text-white">
         <div className="max-w-7xl mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row md:items-center gap-10">
-          <div className="flex-1">
+          <Reveal className="flex-1">
             <h2 className="text-2xl md:text-4xl font-bold tracking-tight max-w-xl">{dict.home.ctaTitle}</h2>
             <p className="mt-4 text-zinc-400 max-w-lg">{dict.home.ctaText}</p>
-          </div>
+          </Reveal>
           <div className="flex flex-col gap-4 shrink-0">
             <a
               href={`tel:${site.phone.replace(/\s/g, "")}`}
@@ -176,9 +181,10 @@ export default async function HomePage({
 
       {/* About */}
       <section className="max-w-7xl mx-auto px-4 py-12 md:py-20 grid md:grid-cols-2 gap-12 items-center">
-        <div className="rounded-2xl overflow-hidden border border-zinc-800">
+        <Reveal className="rounded-2xl overflow-hidden border border-zinc-800">
           <TechIllustration className="w-full" />
-        </div>
+        </Reveal>
+        <Reveal delay={120}>
         <div>
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">{dict.home.aboutTitle}</h2>
           <p className="mt-5 text-zinc-500 leading-relaxed">{dict.home.aboutText}</p>
@@ -197,6 +203,7 @@ export default async function HomePage({
             {dict.home.aboutCta}
           </Link>
         </div>
+        </Reveal>
       </section>
 
       {/* Map */}
@@ -221,7 +228,8 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
-            {posts.map((post) => (
+            {posts.map((post, i) => (
+              <Reveal key={post.id} delay={i * 90} className="h-full">
               <Link
                 key={post.id}
                 href={`/${locale}/blog/${post.slug}`}
@@ -250,6 +258,7 @@ export default async function HomePage({
                 </div>
                 </div>
               </Link>
+              </Reveal>
             ))}
           </div>
         </div>

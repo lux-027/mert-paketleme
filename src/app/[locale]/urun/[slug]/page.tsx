@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getDict, site } from "@/lib/i18n";
 import { getProduct, getCategory, getProducts } from "@/lib/store";
 import { PlaceholderImage, ProductCard } from "@/components/Cards";
+import Reveal from "@/components/Reveal";
 
 export default async function ProductDetailPage({
   params,
@@ -30,6 +31,7 @@ export default async function ProductDetailPage({
         </Link>
       )}
       <div className="grid md:grid-cols-2 gap-10 mt-6">
+        <Reveal>
         {product.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={product.image} alt={name} className="w-full aspect-[4/3] object-cover rounded-2xl border border-zinc-200" />
@@ -38,6 +40,8 @@ export default async function ProductDetailPage({
             <PlaceholderImage dark />
           </div>
         )}
+        </Reveal>
+        <Reveal delay={120}>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{name}</h1>
           {catName && (
@@ -56,14 +60,17 @@ export default async function ProductDetailPage({
             <div className="text-sm text-zinc-500 mt-4">{site.phone}</div>
           </div>
         </div>
+        </Reveal>
       </div>
 
       {related.length > 0 && (
         <div className="mt-16 border-t border-zinc-200 pt-10">
           <h2 className="text-xl font-bold tracking-tight mb-6">{catName}</h2>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} locale={locale} cta={dict.products.viewProduct} />
+            {related.map((p, i) => (
+              <Reveal key={p.id} delay={i * 80} className="h-full">
+                <ProductCard product={p} locale={locale} cta={dict.products.viewProduct} />
+              </Reveal>
             ))}
           </div>
         </div>
