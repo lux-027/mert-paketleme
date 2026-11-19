@@ -2,6 +2,13 @@ import PageHeader from "@/components/PageHeader";
 import RobotIllustration from "@/components/RobotIllustration";
 import { getDict } from "@/lib/i18n";
 
+const industryImages = [
+  "/industries/taneli.jpg",
+  "/industries/toz.jpg",
+  "/industries/sivi.jpg",
+  "/industries/granullu.jpg",
+];
+
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const dict = getDict(locale);
@@ -49,11 +56,23 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <div className="max-w-7xl mx-auto px-4 mt-16">
         <h2 className="text-2xl font-bold tracking-tight mb-8">{dict.home.industriesTitle}</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-          {dict.home.industries.map((t) => (
-            <div key={t} className="border border-zinc-200 rounded-2xl p-6 text-center">
-              <div className="w-10 h-1 bg-zinc-950 rounded mx-auto mb-4" />
-              <div className="font-semibold">{t}</div>
-              <div className="text-xs text-zinc-400 mt-2">{dict.home.industriesText}</div>
+          {dict.home.industries.map((t, i) => (
+            <div
+              key={t}
+              className="group relative aspect-[4/3] rounded-2xl overflow-hidden border border-zinc-200"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={industryImages[i]}
+                alt={t}
+                className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/30 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-4">
+                <div className="w-8 h-0.5 bg-white/70 rounded mb-2" />
+                <div className="text-white font-semibold leading-tight">{t}</div>
+                <div className="text-xs text-zinc-300 mt-1">{dict.home.industriesText}</div>
+              </div>
             </div>
           ))}
         </div>

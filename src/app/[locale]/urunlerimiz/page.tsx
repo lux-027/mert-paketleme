@@ -6,6 +6,13 @@ import ProductsScroller from "@/components/ProductsScroller";
 import { getDict, site } from "@/lib/i18n";
 import { getCategories, getProducts } from "@/lib/store";
 
+const industryImages = [
+  "/industries/taneli.jpg",
+  "/industries/toz.jpg",
+  "/industries/sivi.jpg",
+  "/industries/granullu.jpg",
+];
+
 export default async function ProductsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const dict = getDict(locale);
@@ -64,14 +71,23 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
                 {dict.home.industriesTitle}
               </h3>
             </div>
-            <div className="flex flex-wrap gap-2.5">
-              {dict.home.industries.map((t) => (
-                <span
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:min-w-[34rem]">
+              {dict.home.industries.map((t, i) => (
+                <div
                   key={t}
-                  className="border border-zinc-700 text-zinc-300 text-sm font-medium px-4 py-2 rounded-full"
+                  className="group relative aspect-[4/3] rounded-xl overflow-hidden border border-zinc-800"
                 >
-                  {t}
-                </span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={industryImages[i]}
+                    alt={t}
+                    className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/20 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-3 text-sm font-semibold leading-tight">
+                    {t}
+                  </div>
+                </div>
               ))}
             </div>
           </div>

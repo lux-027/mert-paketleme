@@ -9,19 +9,26 @@ import { site } from "@/lib/i18n";
 function FlagTR() {
   const id = useId().replace(/:/g, "");
   return (
-    <svg width="36" height="26" viewBox="-1 -3 26 22" role="img" aria-label="Türk bayrağı" style={{ flexShrink: 0, overflow: "visible" }}>
+    <svg width="30" height="20" viewBox="-1 -2 26 20" role="img" aria-label="Türk bayrağı" style={{ flexShrink: 0, overflow: "visible" }}>
       <defs>
-        <filter id={id} x="-20%" y="-30%" width="140%" height="160%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.035 0.01" numOctaves="1" seed="3" result="wave">
-            <animate attributeName="baseFrequency" values="0.035 0.01;0.09 0.04;0.035 0.01" dur="3s" repeatCount="indefinite" />
+        <filter id={id} x="-15%" y="-25%" width="130%" height="150%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.015 0.05" numOctaves="2" seed="3" result="wave">
+            <animate
+              attributeName="baseFrequency"
+              values="0.015 0.05;0.03 0.09;0.015 0.05"
+              dur="2.6s"
+              repeatCount="indefinite"
+            />
           </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" in2="wave" scale="3.5" xChannelSelector="R" yChannelSelector="G" />
+          <feDisplacementMap in="SourceGraphic" in2="wave" scale="1.8" xChannelSelector="R" yChannelSelector="G" />
         </filter>
-        <linearGradient id={`${id}-light`}>
-          <stop offset="0" stopColor="#000" stopOpacity="0.12" />
-          <stop offset="0.4" stopColor="#fff" stopOpacity="0.2" />
-          <stop offset="0.7" stopColor="#000" stopOpacity="0.16" />
-          <stop offset="1" stopColor="#fff" stopOpacity="0.12" />
+        <linearGradient id={`${id}-light`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#000" stopOpacity="0.14" />
+          <stop offset="0.3" stopColor="#fff" stopOpacity="0.22" />
+          <stop offset="0.55" stopColor="#000" stopOpacity="0.18" />
+          <stop offset="0.8" stopColor="#fff" stopOpacity="0.18" />
+          <stop offset="1" stopColor="#000" stopOpacity="0.14" />
+          <animateTransform attributeName="gradientTransform" type="translate" values="-0.5 0;0.5 0;-0.5 0" dur="2.6s" repeatCount="indefinite" />
         </linearGradient>
       </defs>
       <g filter={`url(#${id})`}>
@@ -37,7 +44,7 @@ function FlagTR() {
 
 function FlagEN() {
   return (
-    <svg viewBox="0 0 24 16" className="w-8 h-5 rounded-[2px] overflow-hidden shrink-0">
+    <svg viewBox="0 0 24 16" className="w-6 h-4 rounded-[2px] overflow-hidden shrink-0">
       <rect width="24" height="16" fill="#012169" />
       <path d="M0 0l24 16M24 0L0 16" stroke="#fff" strokeWidth="3" />
       <path d="M0 0l24 16M24 0L0 16" stroke="#C8102E" strokeWidth="1.4" />
