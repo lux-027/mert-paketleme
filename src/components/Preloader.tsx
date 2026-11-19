@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const MIN_DURATION = 5000;
 const TIP_INTERVAL = 1800;
@@ -56,7 +56,12 @@ export default function Preloader() {
       setProgress((p) => Math.min(100, p + step));
     }, stepMs);
 
-    const tipIv = setInterval(() => setTipIndex((i) => i + 1), TIP_INTERVAL);
+    const isEnPath = window.location.pathname.startsWith("/en");
+    const len = (isEnPath ? tipsEN : tipsTR).length;
+    const tipIv = setInterval(
+      () => setTipIndex(() => Math.floor(Math.random() * len)),
+      TIP_INTERVAL
+    );
     const t1 = setTimeout(() => setHiding(true), MIN_DURATION);
     const t2 = setTimeout(() => setGone(true), MIN_DURATION + 700);
 
@@ -72,11 +77,7 @@ export default function Preloader() {
 
   const isEn = typeof window !== "undefined" && window.location.pathname.startsWith("/en");
   const tips = isEn ? tipsEN : tipsTR;
-  const shuffled = useRef<number[]>([]);
-  if (shuffled.current.length === 0) {
-    shuffled.current = tips.map((_, i) => i).sort(() => Math.random() - 0.5);
-  }
-  const tip = tips[shuffled.current[tipIndex % tips.length]];
+  const tip = tips[tipIndex % tips.length];
 
   return (
     <div
