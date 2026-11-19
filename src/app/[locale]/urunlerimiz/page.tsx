@@ -8,10 +8,10 @@ import { getDict, site } from "@/lib/i18n";
 import { getCategories, getProducts } from "@/lib/store";
 
 const industryImages = [
-  "/industries/taneli.jpg",
-  "/industries/toz.jpg",
-  "/industries/sivi.jpg",
-  "/industries/granullu.jpg",
+  "/industries/production.svg#grain",
+  "/industries/production.svg#powder",
+  "/industries/production.svg#liquid",
+  "/industries/production.svg#granules",
 ];
 
 export default async function ProductsPage({ params }: { params: Promise<{ locale: string }> }) {

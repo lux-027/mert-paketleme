@@ -98,7 +98,7 @@ export default function Navbar({ locale, dict }: { locale: string; dict: Dict })
                 key={l.href}
                 href={l.href}
                 className={
-                  pathname === l.href
+                  (pathname === l.href || (l.href !== `/${locale}` && pathname.startsWith(`${l.href}/`)))
                     ? "text-zinc-950 font-semibold border-b-2 border-zinc-950 pb-1"
                     : "text-zinc-500 hover:text-zinc-950 transition-colors"
                 }
@@ -124,7 +124,7 @@ export default function Navbar({ locale, dict }: { locale: string; dict: Dict })
             <button type="button" aria-label={locale === "en" ? "Close menu" : "Menüyü kapat"} className="fixed inset-x-0 bottom-0 top-[100px] bg-black/20 backdrop-blur-md" onClick={(event) => event.currentTarget.closest("details")?.removeAttribute("open")} />
             <nav className="absolute z-10 top-full inset-x-0 max-h-[55dvh] overflow-y-auto border-t border-zinc-200 rounded-b-3xl px-5 py-4 flex flex-col gap-1 text-sm bg-white/95 shadow-xl">
               {links.map((l) => (
-                <Link key={l.href} href={l.href} className="flex items-center gap-3 border-b border-zinc-200 px-4 py-2.5 hover:bg-zinc-100 font-medium" onClick={(event) => event.currentTarget.closest("details")?.removeAttribute("open")}>
+                <Link key={l.href} href={l.href} aria-current={pathname === l.href ? "page" : undefined} className={`flex items-center gap-3 border-b border-zinc-200 px-4 py-2.5 hover:bg-zinc-100 font-medium transition-colors ${pathname === l.href || (l.href !== `/${locale}` && pathname.startsWith(`${l.href}/`)) ? "bg-zinc-100 text-zinc-950" : "text-zinc-500"}`} onClick={(event) => event.currentTarget.closest("details")?.removeAttribute("open")}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" className="w-4 h-4 shrink-0" aria-hidden="true"><path d={l.icon} /></svg>
                   {l.label}
                 </Link>

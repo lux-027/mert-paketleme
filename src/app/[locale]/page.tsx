@@ -3,6 +3,7 @@ import { getDict } from "@/lib/i18n";
 import { getCategories, getProducts, getPosts } from "@/lib/store";
 import { CategoryCard, ProductCard } from "@/components/Cards";
 import Reveal from "@/components/Reveal";
+import CompanySections from "@/components/CompanySections";
 import TechIllustration from "@/components/TechIllustration";
 import { site } from "@/lib/i18n";
 
@@ -205,6 +206,8 @@ export default async function HomePage({
         </div>
         </Reveal>
       </section>
+
+      <CompanySections locale={locale} />
 
       {/* Map */}
       <section className="max-w-7xl mx-auto px-4 pb-20">

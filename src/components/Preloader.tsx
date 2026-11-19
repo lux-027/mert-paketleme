@@ -45,7 +45,7 @@ const tipsEN = [
 
 export default function Preloader() {
   const [progress, setProgress] = useState(0);
-  const [tipIndex, setTipIndex] = useState(0);
+  const [tip, setTip] = useState("");
   const [hiding, setHiding] = useState(false);
   const [gone, setGone] = useState(false);
 
@@ -57,27 +57,36 @@ export default function Preloader() {
     }, stepMs);
 
     const isEnPath = window.location.pathname.startsWith("/en");
-    const len = (isEnPath ? tipsEN : tipsTR).length;
-    const tipIv = setInterval(
-      () => setTipIndex(() => Math.floor(Math.random() * len)),
-      TIP_INTERVAL
-    );
+    const tips = isEnPath ? tipsEN : tipsTR;
+    const order = tips.map((_, i) => i);
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    let cursor = 0;
+    const showTip = () => {
+      setTip(tips[order[cursor % order.length]]);
+      cursor++;
+    };
+    const initialTip = setTimeout(showTip, 0);
+    const tipIv = setInterval(showTip, TIP_INTERVAL);
     const t1 = setTimeout(() => setHiding(true), MIN_DURATION);
-    const t2 = setTimeout(() => setGone(true), MIN_DURATION + 700);
+    const t2 = setTimeout(() => {
+      setGone(true);
+      document.documentElement.dataset.introReady = "true";
+      window.dispatchEvent(new Event("intro-ready"));
+    }, MIN_DURATION + 700);
 
     return () => {
       clearInterval(iv);
       clearInterval(tipIv);
+      clearTimeout(initialTip);
       clearTimeout(t1);
       clearTimeout(t2);
     };
   }, []);
 
   if (gone) return null;
-
-  const isEn = typeof window !== "undefined" && window.location.pathname.startsWith("/en");
-  const tips = isEn ? tipsEN : tipsTR;
-  const tip = tips[tipIndex % tips.length];
 
   return (
     <div
@@ -91,12 +100,12 @@ export default function Preloader() {
       </div>
       <div
         key={tip}
-        className="text-zinc-400 text-sm md:text-base mt-3 h-6 preloader-tip"
+        className="text-zinc-400 text-sm md:text-base mt-3 min-h-12 w-full max-w-sm px-6 text-center leading-6 text-balance preloader-tip"
       >
         {tip}
       </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/logo.png" alt="" className="h-16 md:h-20 w-auto invert mt-10" />
+      <img src="/logo.png" alt="" className="h-16 md:h-20 w-auto invert mix-blend-screen mt-10" />
       <div className="w-64 h-[3px] bg-zinc-800 rounded-full mt-10 overflow-hidden">
         <div
           className="h-full bg-white rounded-full transition-[width] duration-100 ease-linear"

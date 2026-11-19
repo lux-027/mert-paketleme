@@ -25,8 +25,13 @@ export default function Reveal({
       },
       { threshold: 0.15 }
     );
-    io.observe(el);
-    return () => io.disconnect();
+    const observe = () => io.observe(el);
+    if (document.documentElement.dataset.introReady === "true") observe();
+    else window.addEventListener("intro-ready", observe, { once: true });
+    return () => {
+      io.disconnect();
+      window.removeEventListener("intro-ready", observe);
+    };
   }, []);
 
   return (

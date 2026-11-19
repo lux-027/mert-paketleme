@@ -2,9 +2,14 @@ import { site } from "@/lib/i18n";
 
 const phone = site.phone.replace(/[\s+]/g, "");
 
-export default function FloatingButtons() {
+export default function FloatingButtons({ locale = "tr" }: { locale?: string }) {
+  const en = locale === "en";
   return (
-    <div className="fixed right-5 bottom-5 z-50 flex flex-col gap-3">
+    <>
+    <nav aria-label={en ? "Quick contact" : "Hızlı iletişim"} className="md:hidden fixed bottom-0 inset-x-0 z-50 grid grid-cols-3 divide-x divide-zinc-200 border-t border-zinc-200 bg-white/95 backdrop-blur-lg shadow-lg pb-[env(safe-area-inset-bottom)]">
+      {[{ href: `tel:+${phone}`, label: en ? "Call" : "Ara", icon: "M5 3h4l2 5-3 2a15 15 0 0 0 6 6l2-3 5 2v4c-9 3-19-7-16-16Z" }, { href: `https://wa.me/${phone}`, label: "WhatsApp", icon: "M21 11.5a9 9 0 0 1-13 8L3 21l1.5-5A9 9 0 1 1 21 11.5Z" }, { href: site.mapsUrl, label: en ? "Directions" : "Yol Tarifi", icon: "M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0ZM15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" }].map((item) => <a key={item.label} href={item.href} target={item.href.startsWith("https") ? "_blank" : undefined} rel="noreferrer" className="flex items-center justify-center gap-2 py-4 text-xs font-semibold active:bg-zinc-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-5 h-5" aria-hidden="true"><path d={item.icon}/></svg>{item.label}</a>)}
+    </nav>
+    <div className="fixed right-5 bottom-5 z-50 hidden md:flex flex-col gap-3">
       <a
         href={`https://wa.me/${phone}`}
         target="_blank"
@@ -19,12 +24,13 @@ export default function FloatingButtons() {
       <a
         href={`tel:+${phone}`}
         aria-label="Ara"
-        className="w-12 h-12 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+        className="w-12 h-12 rounded-full bg-zinc-500 text-white flex items-center justify-center shadow-lg shadow-zinc-950/25 hover:bg-zinc-400 hover:scale-105 transition-all"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
           <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c1 .3 1.9.5 2.9.7a2 2 0 0 1 1.6 1.9Z" />
         </svg>
       </a>
     </div>
+    </>
   );
 }
