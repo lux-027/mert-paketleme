@@ -11,11 +11,11 @@ export default async function PostPage({
 }) {
   const { locale, slug } = await params;
   const dict = getDict(locale);
-  const post = getPost(slug);
+  const post = await getPost(slug);
   if (!post) notFound();
   const title = locale === "en" && post.titleEn ? post.titleEn : post.title;
   const content = locale === "en" && post.contentEn ? post.contentEn : post.content;
-  const others = getPosts().filter((p) => p.slug !== slug).slice(0, 3);
+  const others = (await getPosts()).filter((p) => p.slug !== slug).slice(0, 3);
 
   return (
     <div className="pb-20">

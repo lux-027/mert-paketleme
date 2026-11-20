@@ -26,9 +26,9 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const dict = getDict(locale);
-  const categories = getCategories();
-  const featured = getProducts().filter((p) => p.featured).slice(0, 6);
-  const posts = getPosts().slice(0, 3);
+  const [categories, products, allPosts] = await Promise.all([getCategories(), getProducts(), getPosts()]);
+  const featured = products.filter((p) => p.featured).slice(0, 6);
+  const posts = allPosts.slice(0, 3);
 
   return (
     <div>

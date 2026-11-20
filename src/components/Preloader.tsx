@@ -7,6 +7,8 @@ const brandFont = Rajdhani({ subsets: ["latin", "latin-ext"], weight: "600", dis
 
 const MIN_DURATION = 5000;
 const TIP_INTERVAL = 1800;
+const ADMIN_DURATION = 2400;
+const adminTips = ["Yönetim arayüzü hazırlanıyor…", "İçerik yönetim alanı açılıyor…", "Panel görünümü tamamlanıyor…"];
 
 const tipsTR = [
   "0,25 g – 50 kg hassas gramajlama sistemi kalibre ediliyor…",
@@ -51,6 +53,7 @@ export default function Preloader() {
   const [tip, setTip] = useState("");
   const [hiding, setHiding] = useState(false);
   const [gone, setGone] = useState(true);
+  const [admin, setAdmin] = useState(false);
 
   useEffect(() => {
     const scrollRestoration = window.history.scrollRestoration;
@@ -76,23 +79,28 @@ export default function Preloader() {
       const ready = setTimeout(finish, 0);
       return () => clearTimeout(ready);
     }
-    const start = setTimeout(() => setGone(false), 0);
+    const pathname = window.location.pathname;
+    const isAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
+    const duration = isAdminPath ? ADMIN_DURATION : MIN_DURATION;
+    const start = setTimeout(() => { setAdmin(isAdminPath); setGone(false); }, 0);
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) finish();
     };
     window.addEventListener("pageshow", onPageShow);
     const stepMs = 50;
-    const step = 100 / (MIN_DURATION / stepMs);
+    const step = 100 / (duration / stepMs);
     const iv = setInterval(() => {
       setProgress((p) => Math.min(100, p + step));
     }, stepMs);
 
     const isEnPath = window.location.pathname.startsWith("/en");
-    const tips = isEnPath ? tipsEN : tipsTR;
+    const tips = isAdminPath ? adminTips : isEnPath ? tipsEN : tipsTR;
     const order = tips.map((_, i) => i);
-    for (let i = order.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [order[i], order[j]] = [order[j], order[i]];
+    if (!isAdminPath) {
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
+      }
     }
     let cursor = 0;
     const showTip = () => {
@@ -100,9 +108,9 @@ export default function Preloader() {
       cursor++;
     };
     const initialTip = setTimeout(showTip, 0);
-    const tipIv = setInterval(showTip, TIP_INTERVAL);
-    const t1 = setTimeout(() => setHiding(true), MIN_DURATION);
-    const t2 = setTimeout(finish, MIN_DURATION + 700);
+    const tipIv = setInterval(showTip, isAdminPath ? 800 : TIP_INTERVAL);
+    const t1 = setTimeout(() => setHiding(true), duration);
+    const t2 = setTimeout(finish, duration + 700);
 
     return () => {
       window.history.scrollRestoration = scrollRestoration;
@@ -117,6 +125,27 @@ export default function Preloader() {
   }, []);
 
   if (gone) return null;
+
+  if (admin) return (
+    <div className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top,#1c2533_0%,#09090b_65%)] px-5 text-white transition-opacity duration-700 motion-reduce:transition-none ${hiding ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[.035] bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] bg-[size:48px_48px]" />
+      <div aria-hidden="true" className="pointer-events-none absolute h-72 w-72 rounded-full bg-slate-500/10 blur-3xl" />
+      <section aria-label="Admin paneli yükleniyor" className="relative w-full max-w-sm rounded-3xl border border-white/10 bg-zinc-950/70 p-6 shadow-2xl shadow-black/60 backdrop-blur-xl sm:p-8">
+        <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-4"><span className={`${brandFont.className} text-sm tracking-[.2em] text-zinc-300`}>MERT MAKİNA</span><span className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-[9px] uppercase tracking-widest text-zinc-400">Yönetim</span></div>
+        <div className="relative mx-auto mt-8 flex h-24 w-24 items-center justify-center">
+          <svg aria-hidden="true" viewBox="0 0 100 100" fill="none" className="absolute inset-0 h-full w-full animate-[spin_14s_linear_infinite] text-zinc-600 motion-reduce:animate-none"><circle cx="50" cy="50" r="47" stroke="currentColor" strokeWidth=".7" strokeDasharray="3 7" /></svg>
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-zinc-600/60 bg-gradient-to-br from-slate-700 via-zinc-800 to-zinc-950 shadow-xl shadow-black/40"><svg aria-hidden="true" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.2" className="h-10 w-10 text-zinc-100"><path d="m16 3 11 4v9c0 7-11 13-11 13S5 23 5 16V7Z" /><circle cx="16" cy="12" r="3" /><path d="M10 23v-2a6 6 0 0 1 12 0v2" /></svg></div>
+        </div>
+        <div className="mt-5 text-center"><p className="text-[9px] uppercase tracking-[.28em] text-zinc-500">Yönetici alanı</p><h1 className={`${brandFont.className} mt-2 text-3xl font-semibold tracking-wide`}>Admin Panel Girişi</h1><p className="mt-2 text-xs leading-5 text-zinc-400">Ürünler, kategoriler ve içerikler<br />tek bir yönetim merkezinde.</p></div>
+        <div className="mt-7">
+          <div className="flex items-center justify-between gap-3 text-[10px]"><span className="text-zinc-500">PANEL HAZIRLANIYOR</span><span aria-hidden="true" className="font-mono tabular-nums text-zinc-300">{Math.floor(progress)}%</span></div>
+          <div role="progressbar" aria-label="Panel yükleniyor" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.floor(progress)} className="mt-2 h-1 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-slate-500 via-zinc-200 to-white transition-[width] duration-100 ease-linear motion-reduce:transition-none" style={{ width: `${progress}%` }} /></div>
+          <p role="status" key={tip} className="mt-3 min-h-8 text-center text-[11px] leading-5 text-zinc-400">{tip}</p>
+        </div>
+        <div aria-hidden="true" className="mt-4 grid grid-cols-3 gap-2 border-t border-white/10 pt-4">{["Arayüz", "İçerikler", "Panel"].map((label, index) => <div key={label} className={`flex items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-[9px] transition-colors ${progress >= index * 34 ? "bg-white/5 text-zinc-300" : "text-zinc-700"}`}><span className={`h-1 w-1 rounded-full ${progress >= index * 34 ? "bg-zinc-300" : "bg-zinc-700"}`} />{label}</div>)}</div>
+      </section>
+    </div>
+  );
 
   return (
     <div

@@ -4,7 +4,9 @@ import AdminEditor from "@/components/AdminEditor";
 import ProductMediaFields from "@/components/ProductMediaFields";
 import CategoryPicker from "@/components/CategoryPicker";
 import ProductGalleryFields from "@/components/ProductGalleryFields";
-import { getCategories, getProducts, getCategory } from "@/lib/store";
+import { getCategories, getProducts } from "@/lib/store";
+import AdminForm from "@/components/AdminForm";
+import { cloudinaryConfigured } from "@/lib/cloudinary";
 import { saveProductAction, deleteProductAction } from "../actions";
 
 const input =
@@ -16,9 +18,9 @@ export default async function ProductsAdmin({
   searchParams: Promise<{ edit?: string; new?: string; category?: string }>;
 }) {
   const { edit, new: create, category } = await searchParams;
-  const categories = getCategories();
+  const categories = await getCategories();
   const selectedCategory = categories.find((item) => item.id === category);
-  const allProducts = getProducts();
+  const allProducts = await getProducts();
   const products = selectedCategory ? allProducts.filter((product) => product.categoryId === selectedCategory.id) : allProducts;
   const editing = allProducts.find((p) => p.id === edit);
   const basePath = selectedCategory ? `/admin/products?category=${encodeURIComponent(selectedCategory.id)}` : "/admin/products";
@@ -30,7 +32,7 @@ export default async function ProductsAdmin({
       {selectedCategory && <div className="mb-5 flex flex-wrap items-center gap-3"><span className="rounded-full bg-zinc-950 px-4 py-2 text-xs text-white">{selectedCategory.name}</span><Link href="/admin/products" className="text-xs text-zinc-500 hover:text-black">Tüm ürünleri göster</Link></div>}
       <div className="mb-6 flex justify-end"><Link href={`${basePath}${querySeparator}new=1`} scroll={false} className="rounded-lg sm:rounded-xl bg-black px-3.5 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white hover:bg-zinc-800 transition-colors">+ Yeni ürün ekle</Link></div>
       {(editing || create === "1") && <AdminEditor editing title={editing ? "Ürünü düzenle" : "Yeni ürün ekle"} back={basePath}>
-      <form
+      <AdminForm
         key={editing?.id ?? "new"}
         action={saveProductAction}
         className="bg-white border border-zinc-200 shadow-sm rounded-2xl p-3 sm:p-6 grid gap-3 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3"
@@ -51,19 +53,19 @@ export default async function ProductsAdmin({
             className={input}
           />
         </div>
-        <ProductMediaFields uploadsEnabled={!process.env.VERCEL} existingImage={editing?.image ?? ""} defaultFeatured={editing?.featured ?? false} defaultCategoryId={editing?.categoryId ?? selectedCategory?.id ?? ""} productId={editing?.id} featuredProducts={allProducts.filter((product) => product.featured).map(({ id, name, categoryId, image }) => ({ id, name, categoryId, image }))} />
-        <ProductGalleryFields images={editing?.images} video={editing?.video} uploadsEnabled={!process.env.VERCEL} />
+        <ProductMediaFields uploadsEnabled={cloudinaryConfigured()} existingImage={editing?.image ?? ""} defaultFeatured={editing?.featured ?? false} defaultCategoryId={editing?.categoryId ?? selectedCategory?.id ?? ""} productId={editing?.id} featuredProducts={allProducts.filter((product) => product.featured).map(({ id, name, categoryId, image }) => ({ id, name, categoryId, image }))} />
+        <ProductGalleryFields images={editing?.images} video={editing?.video} uploadsEnabled={cloudinaryConfigured()} />
         <button disabled={categories.length === 0} className="bg-black hover:bg-zinc-800 text-white text-xs sm:text-sm font-semibold py-2 sm:py-3 rounded-xl self-end transition-colors disabled:opacity-40">
           {editing ? "Güncelle" : "Ekle"}
         </button>
-      </form>
+      </AdminForm>
       </AdminEditor>}
 
       <div className="mt-8 flex items-center justify-between rounded-t-2xl bg-zinc-950 px-5 py-4 text-white"><h2 className="text-sm font-semibold">Ürün kütüphanesi</h2><span className="rounded-full bg-white/10 px-2.5 py-1 text-xs text-zinc-300">{products.filter((p) => p.featured).length} çok satan</span></div>
       <div className="bg-white border border-zinc-200 rounded-b-2xl shadow-sm divide-y divide-zinc-100 overflow-hidden">
         {products.length === 0 && <div className="p-8 sm:p-12 text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 text-2xl text-zinc-400">+</div><h3 className="mt-4 font-semibold">Henüz ürün eklenmedi</h3><p className="mt-2 text-sm text-zinc-500">İlk makinenizi eklemek için “Yeni ürün ekle” butonuna tıklayın.</p></div>}
         {products.map((p) => {
-          const cat = getCategory(p.categoryId);
+          const cat = categories.find((category) => category.id === p.categoryId);
           return (
             <div key={p.id} className="flex flex-wrap items-center gap-2 sm:gap-4 p-3 sm:p-5 text-xs sm:text-sm hover:bg-zinc-50 transition-colors">
               {p.image ? (
@@ -81,10 +83,10 @@ export default async function ProductsAdmin({
               <Link href={`${basePath}${querySeparator}edit=${encodeURIComponent(p.id)}`} scroll={false} className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-100">
                 Düzenle
               </Link>
-              <form action={deleteProductAction}>
+              <AdminForm action={deleteProductAction}>
                 <input type="hidden" name="id" value={p.id} />
                 <button className="text-xs font-semibold text-red-500">Sil</button>
-              </form>
+              </AdminForm>
             </div>
           );
         })}

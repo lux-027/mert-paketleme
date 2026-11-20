@@ -17,8 +17,7 @@ const industryImages = [
 export default async function ProductsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const dict = getDict(locale);
-  const categories = getCategories();
-  const products = getProducts();
+  const [categories, products] = await Promise.all([getCategories(), getProducts()]);
   const session = await auth();
   const isAdmin = !!session?.user?.email && ALLOWED_EMAILS.includes(session.user.email);
 

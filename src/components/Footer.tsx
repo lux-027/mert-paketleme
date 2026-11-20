@@ -26,8 +26,8 @@ const icons = {
   ),
 };
 
-export default function Footer({ locale, dict }: { locale: string; dict: Dict }) {
-  const categories = getCategories();
+export default async function Footer({ locale, dict }: { locale: string; dict: Dict }) {
+  const categories = await getCategories();
 
   return (
     <footer className="bg-zinc-950 text-zinc-300">

@@ -66,7 +66,7 @@ export default function ProductGalleryFields({ images = [], video = "", uploadsE
         </div>
       </section>
       {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-xs text-red-700">{error}</p>}
-      {!uploadsEnabled && <p role="status" className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">Canlı medya yüklemesi henüz aktif değil. Vercel için kalıcı fotoğraf/video depolaması bağlanmalıdır. Mevcut görseller korunur.</p>}
+      {!uploadsEnabled && <p role="status" className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">Cloudinary bağlantısı henüz yapılandırılmadı. CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY ve CLOUDINARY_API_SECRET ortam değişkenlerini ekleyip yeniden dağıtım yapın. Mevcut görseller korunur.</p>}
     </div>
   );
 }

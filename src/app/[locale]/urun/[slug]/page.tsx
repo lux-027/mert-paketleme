@@ -13,13 +13,13 @@ export default async function ProductDetailPage({
 }) {
   const { locale, slug } = await params;
   const dict = getDict(locale);
-  const product = getProduct(slug);
+  const product = await getProduct(slug);
   if (!product) notFound();
-  const cat = getCategory(product.categoryId);
+  const cat = await getCategory(product.categoryId);
   const name = locale === "en" && product.nameEn ? product.nameEn : product.name;
   const desc = locale === "en" && product.descriptionEn ? product.descriptionEn : product.description;
   const catName = cat ? (locale === "en" && cat.nameEn ? cat.nameEn : cat.name) : "";
-  const related = getProducts(product.categoryId).filter((p) => p.id !== product.id).slice(0, 3);
+  const related = (await getProducts(product.categoryId)).filter((p) => p.id !== product.id).slice(0, 3);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 pb-16">

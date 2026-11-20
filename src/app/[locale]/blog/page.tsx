@@ -7,7 +7,7 @@ import { getPosts } from "@/lib/store";
 export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const dict = getDict(locale);
-  const [featured, ...posts] = getPosts();
+  const [featured, ...posts] = await getPosts();
   const t = (p: (typeof posts)[number]) =>
     locale === "en" && p.titleEn ? p.titleEn : p.title;
   const ex = (p: (typeof posts)[number]) =>

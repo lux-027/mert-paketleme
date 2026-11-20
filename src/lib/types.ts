@@ -39,3 +39,6 @@ export type Store = {
   products: Product[];
   posts: Post[];
 };
+
+export type ActionResult = { error?: string; redirectTo?: string; success?: string };
+export class UserError extends Error {}

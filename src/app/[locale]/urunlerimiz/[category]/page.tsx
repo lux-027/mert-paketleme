@@ -13,10 +13,10 @@ export default async function CategoryPage({
 }) {
   const { locale, category } = await params;
   const dict = getDict(locale);
-  const cat = getCategory(category);
+  const cat = await getCategory(category);
   if (!cat) notFound();
-  const products = getProducts(cat.id);
-  const others = getCategories().filter((c) => c.id !== cat.id);
+  const [products, categories] = await Promise.all([getProducts(cat.id), getCategories()]);
+  const others = categories.filter((c) => c.id !== cat.id);
   const name = locale === "en" && cat.nameEn ? cat.nameEn : cat.name;
 
   return (
