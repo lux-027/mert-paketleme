@@ -65,6 +65,14 @@ test('media receipts bind the URL, resource type and administrator', async () =>
   assert.throws(() => cloud.readMediaReceipt(Buffer.from(JSON.stringify(payload)).toString('base64url') + '.' + parts[1], 'image', 'admin@example.test'));
 });
 
+test('video verification accepts 100 MB and rejects larger files', async () => {
+  const id = publicId.replace('/image/', '/video/');
+  const video = { ...asset, public_id: id, resource_type: 'video', format: 'mp4', bytes: 100 * 1024 * 1024, secure_url: `https://res.cloudinary.com/test-cloud/video/upload/v1/${id}.mp4` };
+  const receipt = await mediaModule(video).verifyUpload(id, 'video', 'admin@example.test');
+  assert.equal(receipt.url, video.secure_url);
+  await assert.rejects(mediaModule({ ...video, bytes: video.bytes + 1 }).verifyUpload(id, 'video', 'admin@example.test'));
+});
+
 test('Cloudinary metadata rejects foreign, oversized and unsupported assets', async () => {
   await assert.rejects(mediaModule().verifyUpload('foreign/image', 'image', 'admin@example.test'));
   for (const invalid of [{ ...asset, bytes: 3 * 1024 * 1024 }, { ...asset, format: 'svg' }, { ...asset, secure_url: 'https://example.test/image.jpg' }, { ...asset, resource_type: 'video' }]) {
@@ -383,6 +391,29 @@ test('category form contains only a name and square photo picker', async () => {
   assert(inputs.some((node) => node.props.name === 'name'));
   assert(!inputs.some((node) => node.props.name === 'nameEn'));
   assert(elements(tree).some((node) => node.type === 'photo-picker'));
+});
+
+async function adminProductPage(query) {
+  const product = { id: 'p1', name: 'Packing machine', slug: 'packing-machine', categoryId: 'c1', description: 'Product details', image: '/machine.jpg', images: ['/detail.jpg'], video: '/movie.mp4' };
+  const page = load('src/app/admin/products/page.tsx', { 'react/jsx-runtime': { jsx, jsxs: jsx }, 'next/link': 'link', 'next/image': 'image', '@/components/AdminEditor': 'editor', '@/components/AdminForm': 'admin-form', '@/components/ProductMediaFields': 'media-fields', '@/components/CategoryPicker': 'category-picker', '@/components/ProductGalleryFields': 'gallery-fields', '@/components/ProductGallery': 'product-gallery', '@/lib/cloudinary': { cloudinaryConfigured: () => true }, '@/lib/store': { getCategories: async () => [{ id: 'c1', name: 'Machines' }], getProducts: async () => [product] }, '../actions': {} });
+  return page.default({ searchParams: Promise.resolve(query) });
+}
+
+test('admin product cards open a preview and preserve category filtering', async () => {
+  const tree = await adminProductPage({ category: 'c1' });
+  assert(elements(tree).some((node) => node.type === 'link' && node.props.href === '/admin/products?category=c1&view=p1'));
+  const photo = elements(tree).find((node) => node.type === 'img' && node.props.src === '/machine.jpg');
+  assert.match(photo.props.className, /w-full/);
+});
+
+test('admin product preview includes gallery, description and public detail link', async () => {
+  const tree = await adminProductPage({ category: 'c1', view: 'p1' });
+  const editor = elements(tree).find((node) => node.type === 'editor');
+  assert.equal(editor.props.wide, true);
+  const gallery = elements(tree).find((node) => node.type === 'product-gallery');
+  assert.equal(gallery.props.image, '/machine.jpg'); assert.equal(gallery.props.video, '/movie.mp4');
+  assert(elements(tree).some((node) => node.props?.children === 'Product details'));
+  assert(elements(tree).some((node) => node.type === 'link' && node.props.href === '/tr/urun/packing-machine'));
 });
 
 test('category photo-only edits preserve existing English translations', async () => {

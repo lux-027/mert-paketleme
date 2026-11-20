@@ -4,7 +4,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdminEditorState } from "./AdminEditorState";
 
-export default function AdminEditor({ editing, title, back, children, compact = false, formFooter = false }: { editing: boolean; title: string; back: string; children: React.ReactNode; compact?: boolean; formFooter?: boolean }) {
+export default function AdminEditor({ editing, title, back, children, compact = false, formFooter = false, wide = false }: { editing: boolean; title: string; back: string; children: React.ReactNode; compact?: boolean; formFooter?: boolean; wide?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const busyRef = useRef(false);
   const dirtyRef = useRef(false);
@@ -55,7 +55,7 @@ export default function AdminEditor({ editing, title, back, children, compact = 
   };
   return (
     <AdminEditorState.Provider value={{ footer, overlay, photoJobs, setBusy, markDirty, markClean, beginPhotoTask }}>
-    <dialog ref={dialog} aria-labelledby={titleId} onInputCapture={markDirty} onChangeCapture={markDirty} onCancel={(event) => { event.preventDefault(); close(); }} onClick={(event) => { if (!formFooter && event.target === event.currentTarget) close(); }} className={`m-auto w-[calc(100%-2rem)] ${compact ? "max-w-lg" : "max-w-3xl"} max-h-[75svh] sm:max-h-[85svh] overflow-hidden rounded-2xl sm:rounded-3xl border border-zinc-200 bg-zinc-50 p-0 shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm`}>
+    <dialog ref={dialog} aria-labelledby={titleId} onInputCapture={formFooter ? markDirty : undefined} onChangeCapture={formFooter ? markDirty : undefined} onCancel={(event) => { event.preventDefault(); close(); }} onClick={(event) => { if (!formFooter && event.target === event.currentTarget) close(); }} className={`m-auto w-[calc(100%-2rem)] ${compact ? "max-w-lg" : wide ? "max-w-5xl" : "max-w-3xl"} max-h-[75svh] sm:max-h-[85svh] overflow-hidden rounded-2xl sm:rounded-3xl border border-zinc-200 bg-zinc-50 p-0 shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm`}>
       <div className="relative flex max-h-[75svh] sm:max-h-[85svh] flex-col">
       <div className="shrink-0 z-10 flex items-center justify-between gap-4 border-b border-zinc-800 bg-zinc-950 text-white px-4 sm:px-5 py-3 sm:py-4">
         <div><p className="text-[10px] uppercase tracking-[.2em] text-zinc-400">İçerik yönetimi</p><h2 id={titleId} className="mt-1 text-base sm:text-lg font-semibold">{title}</h2></div>

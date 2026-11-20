@@ -5,7 +5,7 @@ import { UserError } from "./types";
 export type MediaKind = "image" | "video";
 type Receipt = { url: string; publicId: string; kind: MediaKind; owner: string; expires: number };
 const formats = { image: ["jpg", "jpeg", "png", "webp", "gif", "avif"], video: ["mp4", "webm"] };
-const maxBytes = { image: 2 * 1024 * 1024, video: 15 * 1024 * 1024 };
+const maxBytes = { image: 2 * 1024 * 1024, video: 100 * 1024 * 1024 };
 
 export function cloudinaryConfigured() {
   return Boolean(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);

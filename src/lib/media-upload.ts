@@ -76,7 +76,7 @@ export async function prepareMedia(data: FormData, status: (progress: UploadProg
   if (data.getAll("retainedImage").length + files.filter(([name]) => name === "gallery").length > 6) throw new Error("Kapak dışında en fazla 6 galeri fotoğrafı ekleyebilirsiniz.");
   for (const [name, file] of files) {
     const video = name === "video";
-    const error = video ? (!["video/mp4", "video/webm"].includes(file.type) || file.size > 15 * 1024 * 1024 ? "Video MP4/WebM ve en fazla 15 MB olmalıdır." : "") : photoError(file);
+    const error = video ? (!["video/mp4", "video/webm"].includes(file.type) || file.size > 100 * 1024 * 1024 ? "Video MP4/WebM ve en fazla 100 MB olmalıdır." : "") : photoError(file);
     if (error) throw new Error(error);
   }
   for (const name of ["image", "gallery", "video"]) data.delete(name);
