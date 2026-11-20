@@ -393,17 +393,107 @@ test('category form contains only a name and square photo picker', async () => {
   assert(elements(tree).some((node) => node.type === 'photo-picker'));
 });
 
-async function adminProductPage(query) {
+async function adminProductPage(query, categories = [{ id: 'c1', name: 'Machines' }], products) {
   const product = { id: 'p1', name: 'Packing machine', slug: 'packing-machine', categoryId: 'c1', description: 'Product details', image: '/machine.jpg', images: ['/detail.jpg'], video: '/movie.mp4' };
-  const page = load('src/app/admin/products/page.tsx', { 'react/jsx-runtime': { jsx, jsxs: jsx }, 'next/link': 'link', 'next/image': 'image', '@/components/AdminEditor': 'editor', '@/components/AdminForm': 'admin-form', '@/components/ProductMediaFields': 'media-fields', '@/components/CategoryPicker': 'category-picker', '@/components/ProductGalleryFields': 'gallery-fields', '@/components/ProductGallery': 'product-gallery', '@/lib/cloudinary': { cloudinaryConfigured: () => true }, '@/lib/store': { getCategories: async () => [{ id: 'c1', name: 'Machines' }], getProducts: async () => [product] }, '../actions': {} });
+  const page = load('src/app/admin/products/page.tsx', { 'react/jsx-runtime': { jsx, jsxs: jsx }, 'next/link': 'link', 'next/image': 'image', '@/components/AdminEditor': 'editor', '@/components/AdminForm': 'admin-form', '@/components/ProductMediaFields': 'media-fields', '@/components/CategoryPicker': 'category-picker', '@/components/ProductCategoryFilter': 'category-filter', '@/components/ProductGalleryFields': 'gallery-fields', '@/components/ProductGallery': 'product-gallery', '@/lib/cloudinary': { cloudinaryConfigured: () => true }, '@/lib/store': { getCategories: async () => categories, getProducts: async () => products ?? [product] }, '../actions': {} });
   return page.default({ searchParams: Promise.resolve(query) });
 }
+
+test('admin filter follows added and deleted categories and does not refresh open editors', async () => {
+  const categories = [{ id: 'c1', name: 'Machines' }, { id: 'c2', name: 'New category' }];
+  let tree = await adminProductPage({}, categories);
+  let filter = elements(tree).find((node) => node.type === 'category-filter');
+  assert.equal(filter.props.categories.find((item) => item.id === 'c2').count, 0);
+  tree = await adminProductPage({ category: 'c1' }, [categories[1]], []);
+  filter = elements(tree).find((node) => node.type === 'category-filter');
+  assert.equal(filter.props.categories.length, 1); assert.equal(filter.props.selectedId, '');
+  tree = await adminProductPage({ new: '1' }, categories);
+  assert.equal(elements(tree).find((node) => node.type === 'category-filter').props.refreshWhenVisible, false);
+});
+
+test('category filter navigates safely and resets a deleted selection', () => {
+  const urls = [];
+  const rig = hooks(); rig.react.useTransition = () => [false, (fn) => fn()];
+  const filter = load('src/components/ProductCategoryFilter.tsx', clients(rig.react, { 'next/navigation': { useRouter: () => ({ push: (url) => urls.push(url), refresh() {} }) } }));
+  const props = { categories: [{ id: 'new group', name: 'New', count: 0 }], selectedId: 'deleted', total: 0 };
+  const tree = rig.render(filter.default, props);
+  const select = elements(tree).find((node) => node.type === 'select');
+  assert.equal(select.props.value, '');
+  select.props.onChange({ currentTarget: { value: 'new group' } }); select.props.onChange({ currentTarget: { value: '' } });
+  assert.deepEqual(urls, ['/admin/products?category=new%20group', '/admin/products']);
+  assert(elements(tree).some((node) => node.type === 'option' && node.props.value === 'new group'));
+});
+
+test('returning to the list refreshes categories but file-picker focus in editors does not', () => {
+  let effect, refreshes = 0, clock = 10000;
+  const window = new EventTarget(); const document = Object.assign(new EventTarget(), { visibilityState: 'visible' });
+  const router = { push() {}, refresh() { refreshes++; } };
+  const rig = hooks(); rig.react.useTransition = () => [false, (fn) => fn()]; rig.react.useEffect = (fn) => { effect = fn; };
+  const filter = load('src/components/ProductCategoryFilter.tsx', clients(rig.react, { 'next/navigation': { useRouter: () => router } }), { window, document, Date: { now: () => clock } });
+  rig.render(filter.default, { categories: [], total: 0 }); const cleanup = effect();
+  window.dispatchEvent(new Event('focus')); document.dispatchEvent(new Event('visibilitychange')); assert.equal(refreshes, 1);
+  clock += 1500; document.visibilityState = 'hidden'; window.dispatchEvent(new Event('focus')); assert.equal(refreshes, 1);
+  document.visibilityState = 'visible'; document.dispatchEvent(new Event('visibilitychange')); assert.equal(refreshes, 2); cleanup();
+  rig.render(filter.default, { categories: [], total: 0, refreshWhenVisible: false }); effect();
+  clock += 1500; window.dispatchEvent(new Event('focus')); assert.equal(refreshes, 2);
+});
+
+test('category pages enable horizontal products and compact recommendations', async () => {
+  const category = { id: 'c1', name: 'Machines', slug: 'machines' };
+  const page = load('src/app/[locale]/urunlerimiz/[category]/page.tsx', { 'react/jsx-runtime': { jsx, jsxs: jsx }, 'next/link': 'link', 'next/navigation': { notFound() { throw Error('Missing category'); } }, '@/components/PageHeader': 'header', '@/components/Cards': { ProductCard: 'product-card', CategoryCard: 'category-card' }, '@/components/Reveal': 'reveal', '@/lib/i18n': { getDict: () => ({ products: { title: 'Ürünler', viewProduct: 'İncele', backToCategories: 'Geri', relatedCategory: 'Kategori' }, home: { categoriesTitle: 'Kategoriler' } }) }, '@/lib/store': { getCategory: async () => category, getCategories: async () => [category, { id: 'c2', name: 'Other', slug: 'other' }], getProducts: async () => [{ id: 'p1' }] } });
+  const tree = await page.default({ params: Promise.resolve({ locale: 'tr', category: 'machines' }) });
+  assert.equal(elements(tree).find((node) => node.type === 'product-card').props.horizontal, true);
+  assert.equal(elements(tree).find((node) => node.type === 'category-card').props.compact, true);
+});
 
 test('admin product cards open a preview and preserve category filtering', async () => {
   const tree = await adminProductPage({ category: 'c1' });
   assert(elements(tree).some((node) => node.type === 'link' && node.props.href === '/admin/products?category=c1&view=p1'));
   const photo = elements(tree).find((node) => node.type === 'img' && node.props.src === '/machine.jpg');
   assert.match(photo.props.className, /w-full/);
+});
+
+test('compact library photos use a small mobile frame and bounded desktop height', async () => {
+  const tree = await adminProductPage({});
+  const frame = elements(tree).find((node) => node.props?.className?.includes('relative flex') && elements(node).some((child) => child.type === 'img' && child.props.src === '/machine.jpg'));
+  assert.match(frame.props.className, /h-28 w-24/);
+  assert.match(frame.props.className, /lg:h-52/);
+});
+
+test('mobile product galleries constrain the main image and scroll thumbnails locally', () => {
+  const rig = hooks();
+  const gallery = load('src/components/ProductGallery.tsx', clients(rig.react));
+  const tree = rig.render(gallery.default, { image: '/cover.jpg', images: Array.from({ length: 6 }, (_, index) => `/photo-${index}.jpg`), name: 'Machine', locale: 'tr' });
+  assert.match(tree.props.className, /max-w-full/);
+  const frame = elements(tree).find((node) => node.props?.className?.includes('relative flex'));
+  assert.match(frame.props.className, /max-h-\[55svh\]/);
+  const strip = elements(tree).find((node) => node.props?.['aria-label'] === 'Ürün görselleri');
+  assert.match(strip.props.className, /max-w-full/); assert.match(strip.props.className, /overflow-x-auto/);
+});
+
+test('product detail grid shrinks its columns instead of widening the mobile viewport', async () => {
+  const product = { id: 'p1', slug: 'machine', name: 'LongMachineName'.repeat(15), image: '/cover.jpg', images: ['/detail.jpg'], categoryId: 'c1', description: 'Description'.repeat(50) };
+  const page = load('src/app/[locale]/urun/[slug]/page.tsx', { 'react/jsx-runtime': { jsx, jsxs: jsx }, 'next/link': 'link', 'next/navigation': { notFound() { throw Error('Unexpected missing product'); } }, '@/lib/i18n': { getDict: () => ({ products: { relatedCategory: 'Kategori' }, hero: { cta2: 'İletişim' } }), site: { phone: '000' } }, '@/lib/store': { getProduct: async () => product, getCategory: async () => ({ id: 'c1', name: 'Machines', slug: 'machines' }), getProducts: async () => [] }, '@/components/Cards': { PlaceholderImage: 'placeholder', ProductCard: 'product-card' }, '@/components/Reveal': 'reveal', '@/components/ProductGallery': 'product-gallery' });
+  const tree = await page.default({ params: Promise.resolve({ locale: 'tr', slug: 'machine' }) });
+  const grid = elements(tree).find((node) => node.props?.className?.includes('md:grid-cols-2'));
+  assert.match(grid.props.className, /grid-cols-1/); assert.match(grid.props.className, /min-w-0/);
+  assert(elements(tree).filter((node) => node.type === 'reveal').every((node) => node.props.className?.includes('min-w-0')));
+  assert.match(elements(tree).find((node) => node.type === 'h1').props.className, /overflow-wrap:anywhere/);
+});
+
+test('horizontal public product cards keep the full machine visible and include a summary', () => {
+  const cards = load('src/components/Cards.tsx', { 'react/jsx-runtime': { jsx, jsxs: jsx }, 'next/link': 'link' });
+  const tree = cards.ProductCard({ product: { name: 'Machine', slug: 'machine', image: '/machine.jpg', description: 'Machine summary' }, locale: 'tr', cta: 'İncele', horizontal: true });
+  assert.match(tree.props.className, /\bflex\b/);
+  assert.match(elements(tree).find((node) => node.type === 'img').props.className, /object-contain/);
+  assert(elements(tree).some((node) => node.props?.children === 'Machine summary'));
+});
+
+test('compact category cards reduce only the recommendation image ratio', () => {
+  const cards = load('src/components/Cards.tsx', { 'react/jsx-runtime': { jsx, jsxs: jsx }, 'next/link': 'link' });
+  const props = { category: { name: 'Machines', slug: 'machines', image: '/category.jpg' }, locale: 'tr' };
+  assert.match(elements(cards.CategoryCard({ ...props, compact: true })).find((node) => node.type === 'img').props.className, /aspect-\[16\/10\]/);
+  assert.match(elements(cards.CategoryCard(props)).find((node) => node.type === 'img').props.className, /aspect-\[4\/3\]/);
 });
 
 test('admin product preview includes gallery, description and public detail link', async () => {

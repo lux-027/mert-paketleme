@@ -3,6 +3,7 @@ import Image from "next/image";
 import AdminEditor from "@/components/AdminEditor";
 import ProductMediaFields from "@/components/ProductMediaFields";
 import CategoryPicker from "@/components/CategoryPicker";
+import ProductCategoryFilter from "@/components/ProductCategoryFilter";
 import ProductGalleryFields from "@/components/ProductGalleryFields";
 import ProductGallery from "@/components/ProductGallery";
 import { getCategories, getProducts } from "@/lib/store";
@@ -32,7 +33,10 @@ export default async function ProductsAdmin({
     <div>
       <div className="mb-5 sm:mb-8 flex items-end justify-between gap-3 sm:gap-4"><div><p className="text-[10px] uppercase tracking-[.25em] text-zinc-500">Katalog yönetimi</p><h1 className="mt-2 text-3xl font-semibold tracking-tight">Ürünler</h1><p className="mt-2 text-sm text-zinc-500">Makine bilgilerini, görsellerini ve kategori yerleşimini yönetin.</p></div><span className="shrink-0 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-500">{products.length} ürün</span></div>
       {selectedCategory && <div className="mb-5 flex flex-wrap items-center gap-3"><span className="rounded-full bg-zinc-950 px-4 py-2 text-xs text-white">{selectedCategory.name}</span><Link href="/admin/products" className="text-xs text-zinc-500 hover:text-black">Tüm ürünleri göster</Link></div>}
-      <div className="mb-6 flex justify-end"><Link href={`${basePath}${querySeparator}new=1`} scroll={false} className="rounded-lg sm:rounded-xl bg-black px-3.5 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white hover:bg-zinc-800 transition-colors">+ Yeni ürün ekle</Link></div>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <ProductCategoryFilter categories={categories.map((item) => ({ id: item.id, name: item.name, count: allProducts.filter((product) => product.categoryId === item.id).length }))} selectedId={selectedCategory?.id ?? ""} total={allProducts.length} refreshWhenVisible={!editing && create !== "1" && !viewing} />
+        <Link href={`${basePath}${querySeparator}new=1`} scroll={false} className="self-end rounded-lg sm:rounded-xl bg-black px-3.5 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white hover:bg-zinc-800 transition-colors">+ Yeni ürün ekle</Link>
+      </div>
       {(editing || create === "1") && <AdminEditor editing title={editing ? "Ürünü düzenle" : "Yeni ürün ekle"} back={basePath} formFooter>
       <AdminForm
         key={editing?.id ?? "new"}
@@ -84,18 +88,18 @@ export default async function ProductsAdmin({
           const cat = categories.find((category) => category.id === p.categoryId);
           return (
             <article key={p.id} className="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-shadow hover:shadow-lg">
-              <Link href={`${basePath}${querySeparator}view=${encodeURIComponent(p.id)}`} scroll={false} className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-800">
-                <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden border-b border-zinc-100 bg-white p-3">
+              <Link href={`${basePath}${querySeparator}view=${encodeURIComponent(p.id)}`} scroll={false} className="group flex min-w-0 sm:block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-800">
+                <div className="relative flex h-28 w-24 shrink-0 items-center justify-center overflow-hidden border-r border-zinc-100 bg-white p-2 sm:h-44 sm:w-full sm:border-b sm:border-r-0 sm:p-3 lg:h-52">
                   {p.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={p.image} alt={p.name} width={640} height={480} loading="lazy" decoding="async" className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105 motion-reduce:transform-none" />
                   ) : (
-                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-14 w-14 text-zinc-300"><rect x="3" y="4" width="18" height="16" rx="3" /><circle cx="8" cy="9" r="1.5" /><path d="m3 17 5-5 4 4 4-5 5 6" /></svg>
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-10 w-10 text-zinc-300 sm:h-14 sm:w-14"><rect x="3" y="4" width="18" height="16" rx="3" /><circle cx="8" cy="9" r="1.5" /><path d="m3 17 5-5 4 4 4-5 5 6" /></svg>
                   )}
-                  {p.featured && <span className="absolute left-3 top-3 rounded-full bg-zinc-950 px-3 py-1.5 text-[9px] font-semibold tracking-wide text-white">ÇOK SATAN</span>}
-                  {p.video && <span className="absolute bottom-3 right-3 rounded-lg bg-zinc-950/80 px-2 py-1 text-[10px] text-white">Video mevcut</span>}
+                  {p.featured && <span className="absolute left-1.5 top-1.5 rounded-full bg-zinc-950 px-2 py-1 text-[8px] font-semibold tracking-wide text-white sm:left-3 sm:top-3 sm:px-3 sm:py-1.5 sm:text-[9px]">ÇOK SATAN</span>}
+                  {p.video && <span className="absolute bottom-1.5 right-1.5 rounded-lg bg-zinc-950/80 px-2 py-1 text-[8px] text-white sm:bottom-3 sm:right-3 sm:text-[10px]">Video mevcut</span>}
                 </div>
-                <div className="p-4"><p className="truncate text-[10px] text-zinc-400">{cat?.name ?? "Kategori bulunamadı"}</p><h3 className="mt-2 min-h-12 break-words text-sm font-semibold leading-6 text-zinc-950 sm:text-base">{p.name}</h3><div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3 text-[10px]"><span className="text-zinc-400">{new Set([p.image, ...(p.images ?? [])].filter(Boolean)).size} fotoğraf</span><span className="font-semibold text-zinc-700 group-hover:text-black">Detayları incele →</span></div></div>
+                <div className="min-w-0 flex-1 p-3 sm:p-4"><p className="truncate text-[10px] text-zinc-400">{cat?.name ?? "Kategori bulunamadı"}</p><h3 className="mt-1.5 break-words text-xs font-semibold leading-5 text-zinc-950 sm:min-h-10 sm:text-sm lg:text-base">{p.name}</h3><div className="mt-2 flex items-center justify-between gap-2 border-t border-zinc-100 pt-2 text-[9px] sm:mt-3 sm:pt-3 sm:text-[10px]"><span className="text-zinc-400">{new Set([p.image, ...(p.images ?? [])].filter(Boolean)).size} fotoğraf</span><span className="font-semibold text-zinc-700 group-hover:text-black">Detayları incele →</span></div></div>
               </Link>
               <div className="mt-auto flex items-center gap-2 border-t border-zinc-100 bg-zinc-50 p-3">
                 <Link href={`${basePath}${querySeparator}edit=${encodeURIComponent(p.id)}`} scroll={false} className="flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-center text-xs font-semibold text-zinc-700 hover:bg-zinc-100">Düzenle</Link>

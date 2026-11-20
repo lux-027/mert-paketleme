@@ -30,10 +30,10 @@ export default async function CategoryPage({
           ← {dict.products.backToCategories}
         </Link>
         {products.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 mt-6">
+          <div className="mt-6 grid min-w-0 grid-cols-1 gap-3 sm:gap-4">
             {products.map((p, i) => (
-              <Reveal key={p.id} delay={i * 80} className="h-full">
-                <ProductCard product={p} locale={locale} cta={dict.products.viewProduct} />
+              <Reveal key={p.id} delay={i * 80} className="h-full min-w-0">
+                <ProductCard product={p} locale={locale} cta={dict.products.viewProduct} horizontal />
               </Reveal>
             ))}
           </div>
@@ -45,21 +45,21 @@ export default async function CategoryPage({
           </div>
         )}
 
-        <div className="mt-16">
-          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-8">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-10 h-1 bg-white rounded" />
+        <div className="mt-10 sm:mt-12">
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5">
+            <div className="mb-4 flex items-center gap-3 sm:mb-5">
+              <div className="h-1 w-7 rounded bg-white" />
               <div>
-                <div className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                   {dict.products.relatedCategory}
                 </div>
-                <h2 className="text-xl font-bold tracking-tight text-white">{dict.home.categoriesTitle}</h2>
+                <h2 className="text-base font-bold tracking-tight text-white sm:text-lg">{dict.home.categoriesTitle}</h2>
               </div>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4 xl:grid-cols-5">
               {others.map((c, i) => (
-                <Reveal key={c.id} delay={i * 80} className="h-full">
-                  <CategoryCard category={c} locale={locale} />
+                <Reveal key={c.id} delay={i * 80} className="h-full min-w-0">
+                  <CategoryCard category={c} locale={locale} compact />
                 </Reveal>
               ))}
             </div>
