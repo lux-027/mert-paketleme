@@ -29,18 +29,18 @@ export default async function AdminPage() {
         </div>
       </div>
       <div className="grid sm:grid-cols-3 gap-4 mt-6">
-        <Link href="/admin/categories" className="group bg-white border border-zinc-200 rounded-2xl p-6 hover:shadow-md hover:border-zinc-400 transition-all">
-          <div className="text-3xl font-bold text-brand">{store.categories.length}</div>
-          <div className="text-sm text-zinc-500 mt-1">Kategori</div>
-        </Link>
-        <Link href="/admin/products" className="group bg-white border border-zinc-200 rounded-2xl p-6 hover:shadow-md hover:border-zinc-400 transition-all">
-          <div className="text-3xl font-bold text-brand">{store.products.length}</div>
-          <div className="text-sm text-zinc-500 mt-1">Ürün</div>
-        </Link>
-        <div className="bg-white border border-zinc-200 rounded-2xl p-6">
-          <div className="text-3xl font-bold text-brand">{messages.length}</div>
-          <div className="text-sm text-zinc-500 mt-1">İletişim Mesajı</div>
-        </div>
+        {[
+          { label: "Kategori", count: store.categories.length, detail: "Makine gruplarını yönetin", href: "/admin/categories", icon: "M3 7V5a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2ZM3 10h18" },
+          { label: "Ürün", count: store.products.length, detail: "Ürün kütüphanesini inceleyin", href: "/admin/products", icon: "m12 3 9 5v9l-9 5-9-5V8ZM3 8l9 5 9-5M12 13v9M7.5 5.5l9 5" },
+          { label: "İletişim Mesajı", count: messages.length, detail: "Müşteri taleplerini görüntüleyin", href: "#messages", icon: "M3 5h18v14H3ZM3 5l9 8 9-8" },
+        ].map((stat, index) => (
+          <Link key={stat.label} href={stat.href} className={`group relative isolate overflow-hidden rounded-2xl border p-5 sm:p-6 shadow-sm hover:shadow-lg transition-all ${index === 0 ? "bg-zinc-950 border-zinc-800 text-white" : "bg-white border-zinc-200 text-zinc-950 hover:border-zinc-400"}`}>
+            <svg aria-hidden="true" viewBox="0 0 200 160" fill="none" stroke="currentColor" className={`pointer-events-none absolute right-0 top-0 h-full w-40 ${index === 0 ? "text-white/10" : "text-zinc-200/70"}`}><circle cx="170" cy="75" r="65" /><circle cx="170" cy="75" r="43" /><path d="M0 35h200M0 75h200M0 115h200M50 0v160M90 0v160M130 0v160M170 0v160" strokeWidth=".5" /></svg>
+            <div className="relative flex items-start justify-between gap-3"><span className={`flex h-11 w-11 items-center justify-center rounded-xl border ${index === 0 ? "border-white/15 bg-white/5" : "border-zinc-200 bg-zinc-50"}`}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="h-5 w-5"><path d={stat.icon} /></svg></span><span aria-hidden="true" className="text-zinc-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span></div>
+            <div className="relative mt-5 flex items-baseline gap-3"><span className="text-4xl font-semibold tracking-tight tabular-nums">{stat.count}</span><span className={`text-sm ${index === 0 ? "text-zinc-400" : "text-zinc-500"}`}>{stat.label}</span></div>
+            <p className={`relative mt-4 border-t pt-3 text-[11px] ${index === 0 ? "border-white/10 text-zinc-500" : "border-zinc-100 text-zinc-400"}`}>{stat.detail}</p>
+          </Link>
+        ))}
       </div>
 
       <div className="mt-8 grid lg:grid-cols-[1.3fr_1fr] gap-6">
@@ -49,7 +49,7 @@ export default async function AdminPage() {
           <div className="mt-5 divide-y divide-zinc-100">
             {store.categories.map((category) => {
               const count = store.products.filter((product) => product.categoryId === category.id).length;
-              return <Link key={category.id} href={`/admin/categories?edit=${category.id}`} className="flex items-center gap-3 py-3 group">
+              return <Link key={category.id} href={`/admin/products?category=${encodeURIComponent(category.id)}`} className="flex items-center gap-3 py-3 group">
                 {category.image && <div role="img" aria-label={category.name} style={{ backgroundImage: `url(${JSON.stringify(category.image)})` }} className="h-11 w-11 shrink-0 rounded-xl bg-zinc-100 bg-cover bg-center border border-zinc-100" />}
                 <span className="min-w-0 flex-1 text-xs sm:text-sm font-medium group-hover:underline underline-offset-4">{category.name}</span><span className="shrink-0 rounded-full bg-zinc-100 px-2.5 py-1 text-[10px] text-zinc-500">{count} ürün</span>
               </Link>;
@@ -61,9 +61,9 @@ export default async function AdminPage() {
           <section className="rounded-2xl border border-zinc-200 bg-zinc-100/70 p-5 sm:p-6"><p className="text-[10px] uppercase tracking-[.2em] text-zinc-500">Yayın öncesi kontrol</p><h2 className="mt-3 text-sm font-semibold">İçeriğinizi eksiksiz hazırlayın</h2><ul className="mt-3 space-y-2 text-xs leading-relaxed text-zinc-500"><li>01 — Ürün adını ve açıklamasını Türkçe girin.</li><li>02 — Doğru kategori ve net bir görsel seçin.</li><li>03 — Kaydettikten sonra sitedeki görünümü inceleyin.</li></ul><p className="mt-4 border-t border-zinc-200 pt-3 text-xs leading-relaxed text-zinc-600">Not: Mevcut dosya tabanlı kayıt sistemi Vercel üzerinde kalıcı depolama sağlamaz. Canlı içerik yönetimi için veritabanı ve görsel depolama bağlantısı gereklidir.</p></section>
         </div>
       </div>
-      {messages.length === 0 && <section className="mt-6 rounded-2xl border border-dashed border-zinc-300 p-6 text-center"><h2 className="text-sm font-semibold">Gelen kutunuz boş</h2><p className="mt-2 text-xs text-zinc-500">Kaydedilen iletişim mesajları bu alanda listelenecek.</p></section>}
+      {messages.length === 0 && <section id="messages" className="mt-6 rounded-2xl border border-dashed border-zinc-300 p-6 text-center"><h2 className="text-sm font-semibold">Gelen kutunuz boş</h2><p className="mt-2 text-xs text-zinc-500">Kaydedilen iletişim mesajları bu alanda listelenecek.</p></section>}
       {messages.length > 0 && (
-        <div className="mt-10">
+        <div id="messages" className="mt-10">
           <h2 className="font-bold text-lg mb-4">Son Mesajlar</h2>
           <div className="space-y-3">
             {messages.slice(0, 10).map((m, i) => (

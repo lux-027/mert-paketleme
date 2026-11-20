@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-export default function AdminEditor({ editing, title, back, children }: { editing: boolean; title: string; back: string; children: React.ReactNode }) {
+export default function AdminEditor({ editing, title, back, children, compact = false }: { editing: boolean; title: string; back: string; children: React.ReactNode; compact?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const router = useRouter();
   const titleId = useId();
@@ -21,7 +21,7 @@ export default function AdminEditor({ editing, title, back, children }: { editin
   if (!editing) return <>{children}</>;
   const close = () => router.push(back, { scroll: false });
   return (
-    <dialog ref={dialog} aria-labelledby={titleId} onCancel={(event) => { event.preventDefault(); close(); }} onClick={(event) => { if (event.target === event.currentTarget) close(); }} className="m-auto w-[calc(100%-2rem)] max-w-3xl max-h-[85svh] rounded-3xl border border-zinc-200 bg-zinc-50 p-0 shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm">
+    <dialog ref={dialog} aria-labelledby={titleId} onCancel={(event) => { event.preventDefault(); close(); }} onClick={(event) => { if (event.target === event.currentTarget) close(); }} className={`m-auto w-[calc(100%-2rem)] ${compact ? "max-w-lg" : "max-w-3xl"} max-h-[85svh] rounded-3xl border border-zinc-200 bg-zinc-50 p-0 shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm`}>
       <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-zinc-800 bg-zinc-950 text-white px-5 py-4">
         <div><p className="text-[10px] uppercase tracking-[.2em] text-zinc-400">İçerik yönetimi</p><h2 id={titleId} className="mt-1 text-lg font-semibold">{title}</h2></div>
         <button type="button" onClick={close} aria-label="Düzenlemeyi kapat" className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 text-zinc-300 hover:bg-zinc-800"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5"><path d="m6 6 12 12M6 18 18 6" /></svg></button>

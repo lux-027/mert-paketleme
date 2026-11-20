@@ -11,18 +11,23 @@ const input =
 export default async function ProductsAdmin({
   searchParams,
 }: {
-  searchParams: Promise<{ edit?: string; new?: string }>;
+  searchParams: Promise<{ edit?: string; new?: string; category?: string }>;
 }) {
-  const { edit, new: create } = await searchParams;
+  const { edit, new: create, category } = await searchParams;
   const categories = getCategories();
-  const products = getProducts();
-  const editing = products.find((p) => p.id === edit);
+  const selectedCategory = categories.find((item) => item.id === category);
+  const allProducts = getProducts();
+  const products = selectedCategory ? allProducts.filter((product) => product.categoryId === selectedCategory.id) : allProducts;
+  const editing = allProducts.find((p) => p.id === edit);
+  const basePath = selectedCategory ? `/admin/products?category=${encodeURIComponent(selectedCategory.id)}` : "/admin/products";
+  const querySeparator = selectedCategory ? "&" : "?";
 
   return (
     <div>
       <div className="mb-8 flex items-end justify-between gap-4"><div><p className="text-[10px] uppercase tracking-[.25em] text-zinc-500">Katalog yönetimi</p><h1 className="mt-2 text-3xl font-semibold tracking-tight">Ürünler</h1><p className="mt-2 text-sm text-zinc-500">Makine bilgilerini, görsellerini ve kategori yerleşimini yönetin.</p></div><span className="shrink-0 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-500">{products.length} ürün</span></div>
-      <div className="mb-6 flex justify-end"><Link href="/admin/products?new=1" scroll={false} className="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-zinc-800 transition-colors">+ Yeni ürün ekle</Link></div>
-      {(editing || create === "1") && <AdminEditor editing title={editing ? "Ürünü düzenle" : "Yeni ürün ekle"} back="/admin/products">
+      {selectedCategory && <div className="mb-5 flex flex-wrap items-center gap-3"><span className="rounded-full bg-zinc-950 px-4 py-2 text-xs text-white">{selectedCategory.name}</span><Link href="/admin/products" className="text-xs text-zinc-500 hover:text-black">Tüm ürünleri göster</Link></div>}
+      <div className="mb-6 flex justify-end"><Link href={`${basePath}${querySeparator}new=1`} scroll={false} className="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-zinc-800 transition-colors">+ Yeni ürün ekle</Link></div>
+      {(editing || create === "1") && <AdminEditor editing title={editing ? "Ürünü düzenle" : "Yeni ürün ekle"} back={basePath}>
       <form
         key={editing?.id ?? "new"}
         action={saveProductAction}
@@ -40,7 +45,7 @@ export default async function ProductsAdmin({
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {categories.map((category) => (
               <label key={category.id} className="relative cursor-pointer">
-                <input type="radio" name="categoryId" value={category.id} required defaultChecked={editing?.categoryId === category.id} className="peer sr-only" />
+                <input type="radio" name="categoryId" value={category.id} required defaultChecked={(editing?.categoryId ?? selectedCategory?.id) === category.id} className="peer sr-only" />
                 <div className="h-full overflow-hidden rounded-xl border border-zinc-200 bg-white transition-all hover:border-zinc-400 peer-checked:border-black peer-checked:ring-2 peer-checked:ring-black peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-zinc-600">
                   {category.image ? (
                     <Image src={category.image} alt="" width={320} height={240} unoptimized className="aspect-[4/3] w-full object-cover bg-zinc-100" />
@@ -62,7 +67,7 @@ export default async function ProductsAdmin({
             className={input}
           />
         </div>
-        <ProductMediaFields existingImage={editing?.image ?? ""} defaultFeatured={editing?.featured ?? false} defaultCategoryId={editing?.categoryId ?? ""} productId={editing?.id} featuredProducts={products.filter((product) => product.featured).map(({ id, name, categoryId, image }) => ({ id, name, categoryId, image }))} />
+        <ProductMediaFields existingImage={editing?.image ?? ""} defaultFeatured={editing?.featured ?? false} defaultCategoryId={editing?.categoryId ?? selectedCategory?.id ?? ""} productId={editing?.id} featuredProducts={allProducts.filter((product) => product.featured).map(({ id, name, categoryId, image }) => ({ id, name, categoryId, image }))} />
         <button className="bg-black hover:bg-zinc-800 text-white text-sm font-semibold py-3 rounded-xl self-end transition-colors">
           {editing ? "Güncelle" : "Ekle"}
         </button>
@@ -88,7 +93,7 @@ export default async function ProductsAdmin({
                   {cat?.name ?? "—"} {p.featured && "· ★ Öne çıkan"}
                 </div>
               </div>
-              <Link href={`/admin/products?edit=${p.id}`} scroll={false} className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-100">
+              <Link href={`${basePath}${querySeparator}edit=${encodeURIComponent(p.id)}`} scroll={false} className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-100">
                 Düzenle
               </Link>
               <form action={deleteProductAction}>
