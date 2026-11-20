@@ -4,18 +4,38 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import vm from 'node:vm';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import ts from 'typescript';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 function load(file, mocks = {}, globals = {}) {
-  const source = fs.readFileSync(path.join(root, file), 'utf8');
+  const source = fs.readFileSync(path.join(root, file), 'utf8').replaceAll('import.meta.url', JSON.stringify(pathToFileURL(path.join(root, file)).href));
   const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true, jsx: ts.JsxEmit.ReactJSX } }).outputText;
   const mod = { exports: {} };
-  vm.runInNewContext(code, { module: mod, exports: mod.exports, require(name) { if (name in mocks) return mocks[name]; if (name === 'server-only') return {}; if (name === 'crypto') return crypto; if (name === 'path') return path; throw Error(`Unexpected import: ${name}`); }, Buffer, URL, AbortSignal, FormData, File, structuredClone, process: { env: {}, cwd: () => root }, ...globals });
+  vm.runInNewContext(code, { module: mod, exports: mod.exports, require(name) { if (name in mocks) return mocks[name]; if (name === 'server-only') return {}; if (name === 'crypto') return crypto; if (name === 'path') return path; if (name === './photo-settings') return load('src/lib/photo-settings.ts'); throw Error(`Unexpected import: ${name}`); }, Buffer, URL, Blob, DOMException, AbortController, AbortSignal, FormData, File, structuredClone, setTimeout, clearTimeout, process: { env: {}, cwd: () => root }, ...globals });
   return mod.exports;
 }
 const types = load('src/lib/types.ts');
+const jsx = (type, props) => ({ type, props });
+const editorContext = { Provider: 'editor-provider' };
+function elements(tree) {
+  if (Array.isArray(tree)) return tree.flatMap(elements);
+  if (!tree || typeof tree !== 'object') return [];
+  return [tree, ...elements(tree.props?.children), ...elements(tree.node)];
+}
+function hooks(context = null) {
+  const slots = [];
+  let cursor = 0;
+  const react = {
+    useEffect() {}, useId: () => 'test-id', useContext: () => context, useCallback: (fn) => fn,
+    useRef(initial) { const index = cursor++; if (!(index in slots)) slots[index] = { current: initial }; return slots[index]; },
+    useState(initial) { const index = cursor++; if (!(index in slots)) slots[index] = typeof initial === 'function' ? initial() : initial; return [slots[index], (value) => { slots[index] = typeof value === 'function' ? value(slots[index]) : value; }]; },
+  };
+  return { react, render(component, props) { cursor = 0; return component(props); } };
+}
+function clients(react, extra = {}) {
+  return { react, 'react/jsx-runtime': { jsx, jsxs: jsx }, 'react-dom': { createPortal: (node, target) => ({ node, target }) }, 'next/navigation': { useRouter: () => ({ push() {}, replace() {}, refresh() {} }) }, 'next/image': 'img', './AdminEditorState': { AdminEditorState: editorContext }, './UploadStatus': 'upload-status', ...extra };
+}
 const secrets = { CLOUDINARY_CLOUD_NAME: 'test-cloud', CLOUDINARY_API_KEY: '123456', CLOUDINARY_API_SECRET: 'test-secret-not-a-real-key' };
 const publicId = 'mert-paketleme/image/11111111-2222-3333-4444-555555555555';
 const asset = { public_id: publicId, resource_type: 'image', type: 'upload', bytes: 100, format: 'jpg', secure_url: `https://res.cloudinary.com/test-cloud/image/upload/v1/${publicId}.jpg` };
@@ -184,24 +204,191 @@ test('product save keeps the selected mixed gallery order', async () => {
   assert.equal(saved.video, '/movie.mp4');
 });
 
-test('editor scrolls the body separately from its footer', () => {
-  const jsx = (type, props) => ({ type, props });
-  const editor = load('src/components/AdminEditor.tsx', { react: { useEffect() {}, useId: () => 'title', useRef: () => ({ current: null }) }, 'react/jsx-runtime': { jsx, jsxs: jsx }, 'next/navigation': { useRouter: () => ({ push() {} }) } });
-  const tree = editor.default({ editing: true, title: 'Product', back: '/admin', children: 'form', formFooter: true });
-  const [, body, footer] = tree.props.children.props.children;
+test('editor scrolls its body separately from footer and upload overlay', () => {
+  const rig = hooks();
+  const editor = load('src/components/AdminEditor.tsx', clients(rig.react));
+  const tree = rig.render(editor.default, { editing: true, title: 'Product', back: '/admin', children: 'form', formFooter: true });
+  const dialog = elements(tree).find((node) => node.type === 'dialog');
+  const [, body, footer, overlay] = dialog.props.children.props.children;
   assert.match(body.props.className, /overflow-y-auto/);
   assert.equal(footer.props.id, 'admin-editor-footer');
   assert.match(footer.props.className, /shrink-0/);
+  assert.match(overlay.props.className, /absolute inset-0/);
 });
 
-test('fixed submit control targets its form and disables during upload', () => {
-  const jsx = (type, props) => ({ type, props });
+test('fixed submit control targets its form and waits for preview processing', () => {
   const target = {};
-  const form = load('src/components/AdminForm.tsx', { react: { useEffect() {}, useId: () => 'form-id', useState: (value) => [value === null ? target : value, () => {}], useTransition: () => [true, () => {}] }, 'react/jsx-runtime': { jsx, jsxs: jsx }, 'react-dom': { createPortal: (node, target) => ({ node, target }) }, 'next/navigation': { useRouter: () => ({ replace() {}, refresh() {} }) }, '@/lib/media-upload': {} });
-  const tree = form.default({ action() {}, submitLabel: 'Ekle', children: 'fields' });
+  const rig = hooks({ footer: target, photoJobs: 1 });
+  const form = load('src/components/AdminForm.tsx', clients(rig.react, { '@/lib/media-upload': {} }));
+  const tree = rig.render(form.default, { action() {}, submitLabel: 'Ekle', children: 'fields' });
   const portal = tree.props.children[1];
-  const button = portal.node.props.children[1];
+  const button = elements(portal).find((node) => node.type === 'button');
   assert.equal(portal.target, target);
   assert.equal(button.props.form, tree.props.id);
   assert.equal(button.props.disabled, true);
+});
+
+test('form editor never dismisses on a backdrop click', () => {
+  let navigations = 0;
+  const rig = hooks();
+  const editor = load('src/components/AdminEditor.tsx', clients(rig.react, { 'next/navigation': { useRouter: () => ({ push() { navigations++; } }) } }));
+  const tree = rig.render(editor.default, { editing: true, title: 'Product', back: '/admin', children: 'form', formFooter: true });
+  const dialog = elements(tree).find((node) => node.type === 'dialog');
+  const backdrop = {};
+  dialog.props.onClick({ target: backdrop, currentTarget: backdrop });
+  assert.equal(navigations, 0);
+});
+
+test('editor guards close and Escape while processing, and confirms dirty dismissal', () => {
+  let navigations = 0;
+  let consent = false;
+  const rig = hooks();
+  const editor = load('src/components/AdminEditor.tsx', clients(rig.react, { 'next/navigation': { useRouter: () => ({ push() { navigations++; } }) } }), { window: { confirm: () => consent } });
+  const tree = rig.render(editor.default, { editing: true, title: 'Product', back: '/admin', children: 'form', formFooter: true });
+  const state = tree.props.value;
+  const dialog = elements(tree).find((node) => node.type === 'dialog');
+  state.setBusy(true); dialog.props.onCancel({ preventDefault() {} });
+  state.setBusy(false);
+  const finish = state.beginPhotoTask(); dialog.props.onCancel({ preventDefault() {} }); finish(); finish();
+  state.markDirty(); dialog.props.onCancel({ preventDefault() {} });
+  assert.equal(navigations, 0);
+  consent = true; dialog.props.onCancel({ preventDefault() {} });
+  assert.equal(navigations, 1);
+});
+
+test('photo previews use serialized workers without main-thread decoding', async () => {
+  let active = 0, maxActive = 0, terminated = 0;
+  class FakeWorker {
+    postMessage(job) { assert.equal(job.mode, 'preview'); active++; maxActive = Math.max(maxActive, active); setTimeout(() => this.onmessage({ data: { blob: new Blob(['thumbnail'], { type: 'image/webp' }) } }), 5); }
+    terminate() { active--; terminated++; }
+  }
+  const photos = load('src/lib/photo-upload.ts', {}, { Worker: FakeWorker, OffscreenCanvas: class {}, createImageBitmap() { throw Error('Main thread decode must not run'); } });
+  const file = new File(['photo'], 'photo.jpg', { type: 'image/jpeg' });
+  const results = await Promise.all([photos.photoPreview(file), photos.photoPreview(file)]);
+  assert.equal(results.length, 2); assert.equal(maxActive, 1); assert.equal(terminated, 2); assert.equal(active, 0);
+});
+
+test('photo worker bounds preview dimensions and releases its decoded bitmap', async () => {
+  const sent = [];
+  let closed = false;
+  const drawn = [];
+  const scope = { postMessage: (value) => sent.push(value) };
+  class Canvas {
+    constructor(width, height) { this.width = width; this.height = height; }
+    getContext() { return { drawImage: () => drawn.push([this.width, this.height]) }; }
+    async convertToBlob() { return new Blob(['thumbnail'], { type: 'image/webp' }); }
+  }
+  load('src/lib/photo-worker.ts', {}, { globalThis: scope, OffscreenCanvas: Canvas, createImageBitmap: async () => ({ width: 6000, height: 4000, close() { closed = true; } }) });
+  await scope.onmessage({ data: { file: new File(['photo'], 'photo.jpg', { type: 'image/jpeg' }), mode: 'preview' } });
+  assert(sent[0].blob.size <= 120 * 1024);
+  assert(drawn.every(([width, height]) => width <= 480 && height <= 480)); assert(closed);
+});
+
+test('canceling background photo processing terminates its worker', async () => {
+  let stopped = 0;
+  class FakeWorker { postMessage() {} terminate() { stopped++; } }
+  const photos = load('src/lib/photo-upload.ts', {}, { Worker: FakeWorker, OffscreenCanvas: class {} });
+  const controller = new AbortController();
+  const job = photos.optimizePhoto(new File([new Uint8Array(3 * 1024 * 1024)], 'photo.jpg', { type: 'image/jpeg' }), controller.signal);
+  await new Promise((resolve) => setTimeout(resolve, 0)); controller.abort();
+  await assert.rejects(job, (error) => error.name === 'AbortError'); assert.equal(stopped, 1);
+});
+
+test('cover selection renders a small thumbnail rather than the original photo', async () => {
+  let jobs = 0;
+  const context = { beginPhotoTask() { jobs++; return () => jobs--; } };
+  const rig = hooks(context);
+  const original = new File([new Uint8Array(3 * 1024 * 1024)], 'machine.jpg', { type: 'image/jpeg' });
+  const thumbnail = new Blob(['thumb'], { type: 'image/webp' });
+  const created = [];
+  const picker = load('src/components/PhotoPicker.tsx', clients(rig.react, { '@/lib/photo-upload': { photoError: () => '', photoPreview: async () => thumbnail } }), { URL: { createObjectURL(blob) { created.push(blob); return 'blob:small-preview'; }, revokeObjectURL() {} } });
+  let tree = rig.render(picker.default, {});
+  const input = elements(tree).find((node) => node.type === 'input');
+  const control = { files: [original], setCustomValidity() {} };
+  await input.props.onChange({ currentTarget: control });
+  tree = rig.render(picker.default, {});
+  assert.equal(elements(tree).find((node) => node.type === 'img').props.src, 'blob:small-preview');
+  assert.equal(created[0], thumbnail); assert.notEqual(created[0], original); assert.equal(jobs, 0); assert.equal(control.files[0], original);
+});
+
+test('video selection does not decode or mount a video until explicitly previewed', () => {
+  const rig = hooks({ markDirty() {} });
+  const component = load('src/components/ProductVideoField.tsx', clients(rig.react), { URL: { createObjectURL: () => 'blob:video', revokeObjectURL() {} } });
+  let tree = rig.render(component.default, { uploadsEnabled: true });
+  const input = elements(tree).find((node) => node.type === 'input');
+  input.props.onChange({ currentTarget: { files: [new File(['video'], 'machine.mp4', { type: 'video/mp4' })] } });
+  tree = rig.render(component.default, { uploadsEnabled: true });
+  assert.equal(elements(tree).filter((node) => node.type === 'video').length, 0);
+  elements(tree).find((node) => node.type === 'button' && node.props.children === 'Videoyu önizle').props.onClick();
+  tree = rig.render(component.default, { uploadsEnabled: true });
+  assert.equal(elements(tree).find((node) => node.type === 'video').props.preload, 'none');
+});
+
+test('upload reports byte progress and retries verification without re-uploading', async () => {
+  let transfers = 0, signs = 0, verifications = 0;
+  class XHR {
+    constructor() { this.upload = {}; }
+    open() {}
+    send() { transfers++; this.upload.onprogress({ lengthComputable: true, loaded: 50, total: 100 }); this.status = 200; this.onload(); }
+    abort() { this.onabort(); }
+  }
+  const uploader = load('src/lib/media-upload.ts', { './photo-upload': { optimizePhoto: async (file) => file, photoError: () => '' } }, { XMLHttpRequest: XHR, fetch: async (_, options) => {
+    const body = JSON.parse(options.body);
+    if (body.operation === 'sign') { signs++; return { ok: true, json: async () => ({ url: 'https://uploads.example.test', apiKey: 'public', signature: 'test', params: { public_id: 'test-id' } }) }; }
+    verifications++;
+    return { ok: verifications > 1, json: async () => verifications === 1 ? { error: 'Temporary verification failure' } : { url: '/verified.jpg', token: 'test-receipt' } };
+  } });
+  const file = new File(['photo'], 'photo.jpg', { type: 'image/jpeg' });
+  const data = () => { const value = new FormData(); value.append('image', file); return value; };
+  const events = [];
+  await assert.rejects(uploader.prepareMedia(data(), (event) => events.push(event)));
+  const retry = data(); await uploader.prepareMedia(retry, (event) => events.push(event));
+  assert.equal(signs, 1); assert.equal(transfers, 1); assert.equal(verifications, 2);
+  assert(events.some((event) => event.stage === 'uploading' && event.percent === 50));
+  assert.equal(retry.get('image'), null); assert.equal(retry.get('imageUpload'), 'test-receipt');
+});
+
+test('upload cancellation aborts the transfer before receipt or saving', async () => {
+  let requests = 0;
+  class XHR { constructor() { this.upload = {}; } open() {} send() {} abort() { this.onabort(); } }
+  const uploader = load('src/lib/media-upload.ts', { './photo-upload': { optimizePhoto: async (file) => file, photoError: () => '' } }, { XMLHttpRequest: XHR, fetch: async () => { requests++; return { ok: true, json: async () => ({ url: 'https://uploads.example.test', apiKey: 'public', signature: 'test', params: { public_id: 'test-id' } }) }; } });
+  const controller = new AbortController();
+  const data = new FormData(); data.append('image', new File(['photo'], 'photo.jpg', { type: 'image/jpeg' }));
+  const job = uploader.prepareMedia(data, () => {}, controller.signal);
+  await new Promise((resolve) => setTimeout(resolve, 0)); controller.abort();
+  await assert.rejects(job, (error) => error.name === 'AbortError');
+  assert.equal(requests, 1); assert.equal(data.get('imageUpload'), null);
+});
+
+test('failed uploads and saves keep form values and never navigate away', async () => {
+  let attempt = 0, saves = 0, navigations = 0;
+  const busy = [];
+  const rig = hooks({ footer: {}, overlay: {}, photoJobs: 0, setBusy: (value) => busy.push(value), markClean() {} });
+  class Snapshot { constructor(form) { this.form = form; } }
+  const component = load('src/components/AdminForm.tsx', clients(rig.react, { '@/lib/media-upload': { prepareMedia: async () => { if (attempt++ === 0) throw Error('Upload failed'); } }, 'next/navigation': { useRouter: () => ({ replace() { navigations++; }, refresh() { navigations++; } }) } }), { FormData: Snapshot });
+  const values = { name: 'Machine', description: 'Keep this text', image: new File(['photo'], 'photo.jpg', { type: 'image/jpeg' }) };
+  const control = { values, reset() { throw Error('Form must not reset'); } };
+  const props = { children: 'fields', submitLabel: 'Ekle', action: async () => { saves++; return { error: 'Database temporarily unavailable' }; } };
+  await rig.render(component.default, props).props.onSubmit({ preventDefault() {}, currentTarget: control });
+  await rig.render(component.default, props).props.onSubmit({ preventDefault() {}, currentTarget: control });
+  assert.equal(saves, 1); assert.equal(navigations, 0); assert.equal(control.values, values);
+  assert(elements(rig.render(component.default, props)).some((node) => node.props?.role === 'alert'));
+  assert.deepEqual(busy, [true, false, true, false]);
+});
+
+test('category form contains only a name and square photo picker', async () => {
+  const page = load('src/app/admin/categories/page.tsx', { 'react/jsx-runtime': { jsx, jsxs: jsx }, 'next/link': 'link', '@/components/AdminEditor': 'editor', '@/components/AdminForm': 'admin-form', '@/components/PhotoPicker': 'photo-picker', '@/lib/cloudinary': { cloudinaryConfigured: () => true }, '@/lib/store': { getCategories: async () => [], getProducts: async () => [] }, '../actions': {} });
+  const tree = await page.default({ searchParams: Promise.resolve({ new: '1' }) });
+  const inputs = elements(tree).filter((node) => node.type === 'input');
+  assert(inputs.some((node) => node.props.name === 'name'));
+  assert(!inputs.some((node) => node.props.name === 'nameEn'));
+  assert(elements(tree).some((node) => node.type === 'photo-picker'));
+});
+
+test('category photo-only edits preserve existing English translations', async () => {
+  let saved;
+  const actions = load('src/app/admin/actions.ts', { 'next/cache': { revalidatePath() {} }, '@/auth': { auth: async () => ({ user: { email: 'allowed@example.test' } }), ALLOWED_EMAILS: ['allowed@example.test'] }, '@/lib/store': { getCategories: async () => [{ id: '1', name: 'Makine', nameEn: 'Machine', image: '/old.jpg' }], saveCategory: async (value) => { saved = value; } }, '@/lib/database': {}, '@/lib/cloudinary': { readMediaReceipt: () => null }, '@/lib/gallery-order': {}, '@/lib/types': types });
+  const data = new FormData(); data.set('id', '1'); data.set('name', 'Makine');
+  const result = await actions.saveCategoryAction(data);
+  assert.equal(result.error, undefined); assert.equal(saved.nameEn, 'Machine'); assert.equal(saved.image, '/old.jpg');
 });

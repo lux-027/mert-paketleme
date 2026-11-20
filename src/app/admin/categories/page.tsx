@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AdminEditor from "@/components/AdminEditor";
 import AdminForm from "@/components/AdminForm";
+import PhotoPicker from "@/components/PhotoPicker";
 import { cloudinaryConfigured } from "@/lib/cloudinary";
 import { getCategories, getProducts } from "@/lib/store";
 import { saveCategoryAction, deleteCategoryAction } from "../actions";
@@ -32,17 +33,10 @@ export default async function CategoriesAdmin({
         <input type="hidden" name="id" value={editing?.id ?? ""} />
         <input type="hidden" name="existingImage" value={editing?.image ?? ""} />
         <div>
-          <label className="text-xs text-zinc-500">Kategori Adı (TR)</label>
-          <input name="name" required defaultValue={editing?.name ?? ""} className={input} />
+          <label className="text-xs text-zinc-500">Kategori adı</label>
+          <input name="name" required maxLength={160} defaultValue={editing?.name ?? ""} className={input} />
         </div>
-        <div>
-          <label className="text-xs text-zinc-500">Kategori Adı (EN)</label>
-          <input name="nameEn" defaultValue={editing?.nameEn ?? ""} className={input} />
-        </div>
-        <div>
-          <label className="text-xs text-zinc-500">Kapak Resmi</label>
-          <input name="image" type="file" disabled={!cloudinaryConfigured()} accept="image/jpeg,image/png,image/webp,image/gif,image/avif" className={input} />
-        </div>
+        <PhotoPicker existingImage={editing?.image ?? ""} disabled={!cloudinaryConfigured()} />
       </AdminForm>
       </AdminEditor>}
 

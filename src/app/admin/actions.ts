@@ -44,7 +44,8 @@ export async function saveCategoryAction(data: FormData): Promise<ActionResult> 
     const id = text(data, "id", 80) || undefined;
     const existing = (await getCategories()).find((category) => category.id === id);
     const image = readMediaReceipt(data.get("imageUpload"), "image", email);
-    await saveCategory({ id, name: text(data, "name", 160, true), nameEn: text(data, "nameEn", 160), image: image ?? existing?.image ?? "" });
+    const name = text(data, "name", 160, true);
+    await saveCategory({ id, name, nameEn: existing?.name === name ? existing.nameEn : "", image: image ?? existing?.image ?? "" });
     revalidatePath("/", "layout");
     return { redirectTo: "/admin/categories" };
   });

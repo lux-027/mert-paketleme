@@ -1,22 +1,17 @@
 "use client";
 
-import { photoError } from "@/lib/photo-upload";
-
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import PhotoPicker from "./PhotoPicker";
 
 type FeaturedProduct = { id: string; name: string; categoryId: string; image?: string };
 
 export default function ProductMediaFields({ existingImage, defaultFeatured, defaultCategoryId, productId, featuredProducts, uploadsEnabled = true }: { existingImage: string; defaultFeatured: boolean; defaultCategoryId: string; productId?: string; featuredProducts: FeaturedProduct[]; uploadsEnabled?: boolean }) {
   const container = useRef<HTMLDivElement>(null);
-  const previewUrl = useRef("");
   const [preview, setPreview] = useState(existingImage);
-  const [fileName, setFileName] = useState("");
   const [featured, setFeatured] = useState(defaultFeatured);
   const [categoryId, setCategoryId] = useState(defaultCategoryId);
   const replaced = featuredProducts.find((product) => product.categoryId === categoryId && product.id !== productId);
-
-  useEffect(() => () => { if (previewUrl.current) URL.revokeObjectURL(previewUrl.current); }, []);
 
   useEffect(() => {
     const form = container.current?.closest("form");
@@ -46,29 +41,7 @@ export default function ProductMediaFields({ existingImage, defaultFeatured, def
   return (
     <div ref={container} className="sm:col-span-2 lg:col-span-3 min-w-0 grid sm:grid-cols-[180px_1fr] gap-3 sm:gap-5">
       <input type="hidden" name="confirmedFeaturedId" defaultValue="" />
-      <div>
-        <p className="mb-2 text-xs font-medium text-zinc-600">Kapak fotoğrafı</p>
-        <label className="relative flex aspect-square w-36 sm:w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-zinc-300 bg-zinc-100 hover:border-zinc-600 transition-colors focus-within:ring-2 focus-within:ring-zinc-600">
-          <input type="file" name="image" disabled={!uploadsEnabled} accept="image/jpeg,image/png,image/webp,image/gif,image/avif" aria-label="Kapak fotoğrafı seç" className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0" onChange={(event) => {
-            const file = event.target.files?.[0];
-            event.target.setCustomValidity("");
-            const error = file ? photoError(file) : "";
-            if (error) {
-              event.target.value = "";
-              event.target.setCustomValidity(error);
-              event.target.reportValidity();
-              return;
-            }
-            if (previewUrl.current) URL.revokeObjectURL(previewUrl.current);
-            previewUrl.current = file ? URL.createObjectURL(file) : "";
-            setPreview(previewUrl.current || existingImage);
-            setFileName(file?.name ?? "");
-          }} />
-          {preview ? <Image src={preview} alt="Seçilen ürün fotoğrafı" fill unoptimized className="object-contain p-2" /> : <><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-9 w-9 text-zinc-400"><rect x="3" y="4" width="18" height="16" rx="3" /><circle cx="8" cy="9" r="1.5" /><path d="m3 17 5-5 4 4 4-5 5 6" /></svg><span className="mt-3 text-xs font-medium text-zinc-600">Fotoğraf seç</span></>}
-          {preview && <span className="absolute bottom-0 inset-x-0 bg-black/75 p-2 text-center text-[10px] text-white">Fotoğrafı değiştirmek için tıklayın</span>}
-        </label>
-        <p className="mt-2 truncate text-[10px] text-zinc-400">{fileName || "En fazla 20 MB. Büyük fotoğraflar otomatik küçültülür."}</p>
-      </div>
+      <PhotoPicker existingImage={existingImage} disabled={!uploadsEnabled} onPreviewChange={setPreview} />
       <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
         <label className="flex cursor-pointer items-center gap-3 bg-zinc-950 p-3 sm:p-4 text-white">
           <input type="checkbox" name="featured" checked={featured} onChange={(event) => setFeatured(event.target.checked)} className="h-4 w-4 accent-zinc-500" />
