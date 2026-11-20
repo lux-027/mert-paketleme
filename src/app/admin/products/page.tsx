@@ -104,6 +104,19 @@ export default async function ProductsAdmin({
           );
         })}
       </div>
+      {selectedCategory && categories.some((item) => item.id !== selectedCategory.id) && (
+        <section className="mt-10 border-t border-zinc-300 pt-7" aria-labelledby="other-categories-title">
+          <div className="mb-5 flex items-end justify-between gap-4"><div><p className="text-[10px] uppercase tracking-[.2em] text-zinc-500">Katalogda gezin</p><h2 id="other-categories-title" className="mt-2 text-lg font-semibold">Diğer kategoriler</h2></div><Link href="/admin/categories" className="text-xs text-zinc-500 hover:text-black">Tüm kategoriler →</Link></div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
+            {categories.filter((item) => item.id !== selectedCategory.id).map((item) => (
+              <Link key={item.id} href={`/admin/products?category=${encodeURIComponent(item.id)}`} className="group flex flex-col overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-950 hover:border-zinc-400 transition-colors">
+                {item.image ? <Image src={item.image} alt="" width={320} height={240} unoptimized className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transform-none" /> : <div className="aspect-[4/3] flex items-center justify-center bg-zinc-800 text-zinc-500"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-8 w-8"><path d="M3 7V5h6l3 3h9v12H3ZM3 11h18" /></svg></div>}
+                <div className="relative flex flex-1 flex-col bg-zinc-950 p-3"><h3 className="text-xs font-medium leading-5 text-zinc-200">{item.name}</h3><div className="mt-auto pt-3 flex items-center justify-between text-[10px] text-zinc-500"><span>{allProducts.filter((product) => product.categoryId === item.id).length} ürün</span><span aria-hidden="true" className="text-zinc-300 group-hover:translate-x-1 transition-transform">→</span></div></div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
