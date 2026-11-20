@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { getCategories, getProducts, getCategory } from "@/lib/store";
 import { saveProductAction, deleteProductAction } from "../actions";
 
 const input =
-  "border border-zinc-300 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-brand/40";
+  "mt-1.5 border border-zinc-200 bg-zinc-50 rounded-xl px-3 py-3 text-sm w-full focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-zinc-500 transition-colors file:mr-3 file:border-0 file:rounded-md file:bg-zinc-200 file:px-2 file:py-1 file:text-xs";
 
 export default async function ProductsAdmin({
   searchParams,
@@ -16,11 +17,12 @@ export default async function ProductsAdmin({
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Ürünler</h1>
+      <div className="mb-8 flex items-end justify-between gap-4"><div><p className="text-[10px] uppercase tracking-[.25em] text-zinc-500">Katalog yönetimi</p><h1 className="mt-2 text-3xl font-semibold tracking-tight">Ürünler</h1><p className="mt-2 text-sm text-zinc-500">Makine bilgilerini, görsellerini ve iki dilde açıklamalarını yönetin.</p></div><span className="shrink-0 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-500">{products.length} ürün</span></div>
+      <div className="mb-4 flex items-center justify-between"><h2 className="text-sm font-semibold">{editing ? "Ürünü düzenle" : "Yeni ürün oluştur"}</h2>{editing && <Link href="/admin/products" className="text-xs text-zinc-500 hover:text-black">Düzenlemeyi iptal et</Link>}</div>
 
       <form
         action={saveProductAction}
-        className="bg-white border border-zinc-200 rounded-xl p-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+        className="bg-white border border-zinc-200 shadow-sm rounded-2xl p-5 sm:p-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
       >
         <input type="hidden" name="id" value={editing?.id ?? ""} />
         <input type="hidden" name="existingImage" value={editing?.image ?? ""} />
@@ -74,16 +76,18 @@ export default async function ProductsAdmin({
           <input type="checkbox" name="featured" defaultChecked={editing?.featured ?? false} />
           Öne çıkan ürün
         </label>
-        <button className="bg-brand hover:bg-brand-dark text-white font-semibold py-2 rounded-lg self-end">
+        <button className="bg-black hover:bg-zinc-800 text-white text-sm font-semibold py-3 rounded-xl self-end transition-colors">
           {editing ? "Güncelle" : "Ekle"}
         </button>
       </form>
 
-      <div className="mt-6 bg-white border border-zinc-200 rounded-xl divide-y divide-zinc-100">
+      <div className="mt-8 mb-4 flex items-center justify-between"><h2 className="text-sm font-semibold">Ürün kütüphanesi</h2><span className="text-xs text-zinc-500">{products.filter((p) => p.featured).length} öne çıkan</span></div>
+      <div className="bg-white border border-zinc-200 rounded-2xl shadow-sm divide-y divide-zinc-100 overflow-hidden">
+        {products.length === 0 && <div className="p-8 sm:p-12 text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 text-2xl text-zinc-400">+</div><h3 className="mt-4 font-semibold">Henüz ürün eklenmedi</h3><p className="mt-2 text-sm text-zinc-500">İlk makinenizi eklemek için yukarıdaki formu doldurun.</p></div>}
         {products.map((p) => {
           const cat = getCategory(p.categoryId);
           return (
-            <div key={p.id} className="flex items-center gap-4 p-3 text-sm">
+            <div key={p.id} className="flex flex-wrap items-center gap-3 sm:gap-4 p-4 sm:p-5 text-sm hover:bg-zinc-50 transition-colors">
               {p.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p.image} alt="" className="w-12 h-12 object-cover rounded-lg" />
@@ -96,7 +100,7 @@ export default async function ProductsAdmin({
                   {cat?.name ?? "—"} {p.featured && "· ★ Öne çıkan"}
                 </div>
               </div>
-              <a href={`/admin/products?edit=${p.id}`} className="text-xs font-semibold text-brand">
+              <a href={`/admin/products?edit=${p.id}`} className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-100">
                 Düzenle
               </a>
               <form action={deleteProductAction}>

@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { getCategories, getProducts } from "@/lib/store";
 import { saveCategoryAction, deleteCategoryAction } from "../actions";
 
 const input =
-  "border border-zinc-300 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-brand/40";
+  "mt-1.5 border border-zinc-200 bg-zinc-50 rounded-xl px-3 py-3 text-sm w-full focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-zinc-500 transition-colors file:mr-3 file:border-0 file:rounded-md file:bg-zinc-200 file:px-2 file:py-1 file:text-xs";
 
 export default async function CategoriesAdmin({
   searchParams,
@@ -15,11 +16,12 @@ export default async function CategoriesAdmin({
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Kategoriler</h1>
+      <div className="mb-8 flex items-end justify-between gap-4"><div><p className="text-[10px] uppercase tracking-[.25em] text-zinc-500">Katalog yönetimi</p><h1 className="mt-2 text-3xl font-semibold tracking-tight">Kategoriler</h1><p className="mt-2 text-sm text-zinc-500">Makine gruplarını ve kategori kapaklarını düzenleyin.</p></div><span className="shrink-0 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-500">{categories.length} kategori</span></div>
+      <div className="mb-4 flex items-center justify-between"><h2 className="text-sm font-semibold">{editing ? "Kategoriyi düzenle" : "Yeni kategori oluştur"}</h2>{editing && <Link href="/admin/categories" className="text-xs text-zinc-500 hover:text-black">Düzenlemeyi iptal et</Link>}</div>
 
       <form
         action={saveCategoryAction}
-        className="bg-white border border-zinc-200 rounded-xl p-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 items-end"
+        className="bg-white border border-zinc-200 shadow-sm rounded-2xl p-5 sm:p-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 items-end"
       >
         <input type="hidden" name="id" value={editing?.id ?? ""} />
         <input type="hidden" name="existingImage" value={editing?.image ?? ""} />
@@ -35,14 +37,14 @@ export default async function CategoriesAdmin({
           <label className="text-xs text-zinc-500">Kapak Resmi</label>
           <input name="image" type="file" accept="image/*" className={input} />
         </div>
-        <button className="bg-brand hover:bg-brand-dark text-white font-semibold py-2 rounded-lg">
+        <button className="bg-black hover:bg-zinc-800 text-white text-sm font-semibold py-3 rounded-xl transition-colors">
           {editing ? "Güncelle" : "Ekle"}
         </button>
       </form>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         {categories.map((c) => (
-          <div key={c.id} className="bg-white border border-zinc-200 rounded-xl overflow-hidden">
+          <div key={c.id} className="bg-white border border-zinc-200 rounded-2xl overflow-hidden shadow-sm flex flex-col hover:shadow-md transition-shadow">
             {c.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={c.image} alt={c.name} className="w-full aspect-[4/3] object-cover" />
@@ -51,15 +53,15 @@ export default async function CategoriesAdmin({
                 Resim yok
               </div>
             )}
-            <div className="p-3">
+            <div className="p-4 flex flex-col flex-1">
               <div className="font-semibold text-sm">{c.name}</div>
               <div className="text-xs text-zinc-400">
                 {getProducts(c.id).length} ürün
               </div>
-              <div className="flex gap-2 mt-3">
+              <div className="flex items-center gap-3 mt-auto pt-4">
                 <a
                   href={`/admin/categories?edit=${c.id}`}
-                  className="text-xs font-semibold text-brand"
+                  className="rounded-lg border border-zinc-200 px-3 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50"
                 >
                   Düzenle
                 </a>
