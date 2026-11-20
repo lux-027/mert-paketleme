@@ -7,9 +7,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-screen bg-zinc-200/70">
       <header className="bg-black border-b border-white/10 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap w-full lg:w-auto items-center gap-4 lg:gap-6">
-            <Link href="/admin" className="flex items-center gap-2 font-bold">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+          <div className="flex flex-wrap w-full lg:w-auto items-center gap-3 sm:gap-4 lg:gap-6">
+            <Link href="/admin" className="flex w-full sm:w-auto items-center justify-between sm:justify-start gap-2 font-bold">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/logo.png" alt="Mert Packing Machine" className="h-7 w-auto invert" />
               <span className="ml-2 inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-gradient-to-b from-zinc-800 to-zinc-950 px-2.5 py-1.5 text-[10px] font-medium tracking-wide text-zinc-200 shadow-sm">
@@ -38,7 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           )}
         </div>
       </header>
-      <main className="max-w-7xl mx-auto px-4 py-8">{children}</main>
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 py-5 sm:py-8">{children}</main>
     </div>
   );
 }

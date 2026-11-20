@@ -33,7 +33,7 @@ export function getCategory(idOrSlug: string): Category | undefined {
 
 export function getProducts(categoryId?: string): Product[] {
   const { products } = read();
-  return categoryId ? products.filter((p) => p.categoryId === categoryId) : products;
+  return (categoryId ? products.filter((p) => p.categoryId === categoryId) : products).sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
 }
 
 export function getProduct(slug: string): Product | undefined {
@@ -103,6 +103,8 @@ export function saveProduct(input: Partial<Product> & { name: string; categoryId
     description: input.description ?? "",
     descriptionEn: input.descriptionEn ?? "",
     image: input.image ?? "",
+    images: input.images ?? [],
+    video: input.video ?? "",
     featured: input.featured ?? false,
   };
   store.products.push(product);

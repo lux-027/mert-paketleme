@@ -36,7 +36,7 @@ export default function ProductionBanner({ locale }: { locale: string }) {
       <div className="relative aspect-video max-h-[340px] bg-black">
       {[1, 2, 3, 4].map((image, index) => (
         <div key={image} aria-hidden={active !== index} className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 motion-reduce:transition-none ${active === index ? "opacity-100" : "opacity-0"}`}>
-          <Image src={`/production-${image}.webp${image === 3 ? "?v=2" : ""}`} alt={en ? `Mert Makina production facility ${image}` : `Mert Makina üretim tesisi ${image}`} width={1376} height={768} unoptimized priority={index === 0} className="block w-auto h-auto rounded-2xl sm:rounded-3xl max-h-[90%] max-w-[90%] md:max-h-full md:max-w-full" />
+          <Image src={`/production-${image}.webp${image === 3 ? "?v=2" : ""}`} alt={en ? `Mert Makina production facility ${image}` : `Mert Makina üretim tesisi ${image}`} width={1376} height={768} unoptimized priority={index === 0} className="block w-auto h-auto rounded-2xl sm:rounded-3xl max-h-[86%] max-w-[86%] md:max-h-[92%] md:max-w-[92%]" />
         </div>
       ))}
       </div>

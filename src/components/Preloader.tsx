@@ -53,12 +53,24 @@ export default function Preloader() {
   const [gone, setGone] = useState(true);
 
   useEffect(() => {
+    const scrollRestoration = window.history.scrollRestoration;
     const finish = () => {
+      window.history.scrollRestoration = scrollRestoration;
       setGone(true);
       document.documentElement.dataset.introReady = "true";
       window.dispatchEvent(new Event("intro-ready"));
     };
     const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    if (navigation?.type === "reload") {
+      const pathname = window.location.pathname;
+      const home = pathname === "/admin" || pathname.startsWith("/admin/") ? "/admin" : pathname === "/en" || pathname.startsWith("/en/") ? "/en" : "/tr";
+      if (pathname !== home || window.location.search || window.location.hash) {
+        window.location.replace(home);
+        return;
+      }
+      window.history.scrollRestoration = "manual";
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
     const skip = document.documentElement.dataset.introReady === "true" || navigation?.type === "back_forward";
     if (skip) {
       const ready = setTimeout(finish, 0);
@@ -93,6 +105,7 @@ export default function Preloader() {
     const t2 = setTimeout(finish, MIN_DURATION + 700);
 
     return () => {
+      window.history.scrollRestoration = scrollRestoration;
       clearTimeout(start);
       window.removeEventListener("pageshow", onPageShow);
       clearInterval(iv);

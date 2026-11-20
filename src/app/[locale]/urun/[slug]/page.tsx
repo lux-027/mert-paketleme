@@ -4,6 +4,7 @@ import { getDict, site } from "@/lib/i18n";
 import { getProduct, getCategory, getProducts } from "@/lib/store";
 import { PlaceholderImage, ProductCard } from "@/components/Cards";
 import Reveal from "@/components/Reveal";
+import ProductGallery from "@/components/ProductGallery";
 
 export default async function ProductDetailPage({
   params,
@@ -32,7 +33,7 @@ export default async function ProductDetailPage({
       )}
       <div className="grid md:grid-cols-2 gap-10 mt-6">
         <Reveal>
-        {product.image ? (
+        {product.images?.length || product.video ? <ProductGallery key={product.id} image={product.image} images={product.images} video={product.video} name={name} locale={locale} /> : product.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={product.image} alt={name} className="w-full aspect-[4/3] object-cover rounded-2xl border border-zinc-200" />
         ) : (
@@ -43,6 +44,7 @@ export default async function ProductDetailPage({
         </Reveal>
         <Reveal delay={120}>
         <div>
+          {product.featured && <span className="mb-3 inline-block rounded-full bg-zinc-950 px-3 py-1.5 text-[10px] font-semibold tracking-wide text-white">{locale === "en" ? "BEST SELLER" : "ÇOK SATAN"}</span>}
           <h1 className="text-3xl font-bold tracking-tight">{name}</h1>
           {catName && (
             <div className="text-sm text-zinc-400 mt-1">

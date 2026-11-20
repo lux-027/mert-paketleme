@@ -15,7 +15,7 @@ export default function AdminNavigation() {
     <nav aria-label="Yönetim menüsü" className="flex w-full sm:w-auto items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1">
       {links.map(({ href, label, path }) => {
         const active = pathname === href;
-        return <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`flex flex-1 sm:flex-none items-center justify-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-white ${active ? "bg-white text-black shadow-sm" : "text-zinc-400 hover:bg-white/10 hover:text-white"}`}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="h-4 w-4"><path d={path} /></svg>{label}</Link>;
+        return <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`flex flex-1 sm:flex-none items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap rounded-lg px-2 sm:px-3 py-2 text-[11px] sm:text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-white ${active ? "bg-white text-black shadow-sm" : "text-zinc-400 hover:bg-white/10 hover:text-white"}`}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="h-4 w-4"><path d={path} /></svg>{label}</Link>;
       })}
     </nav>
   );

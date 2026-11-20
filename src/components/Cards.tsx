@@ -62,6 +62,7 @@ export function ProductCard({ product, locale, cta }: { product: Product; locale
         <PlaceholderImage />
       )}
       <div className="p-4">
+        {product.featured && <span className="mb-2 inline-block rounded-full bg-zinc-950 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-white">{locale === "en" ? "BEST SELLER" : "ÇOK SATAN"}</span>}
         <div className="font-semibold group-hover:underline underline-offset-4">{name}</div>
         <div className="text-sm text-zinc-400 mt-2 flex items-center gap-1">
           {cta} <span className="group-hover:translate-x-1 transition-transform">→</span>

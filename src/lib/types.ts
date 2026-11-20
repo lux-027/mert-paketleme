@@ -15,6 +15,8 @@ export type Product = {
   description: string;
   descriptionEn?: string;
   image: string;
+  images?: string[];
+  video?: string;
   featured?: boolean;
 };
 
