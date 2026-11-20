@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Rajdhani } from "next/font/google";
+
+const brandFont = Rajdhani({ subsets: ["latin", "latin-ext"], weight: "600", display: "swap" });
 
 const MIN_DURATION = 5000;
 const TIP_INTERVAL = 1800;
@@ -47,9 +50,25 @@ export default function Preloader() {
   const [progress, setProgress] = useState(0);
   const [tip, setTip] = useState("");
   const [hiding, setHiding] = useState(false);
-  const [gone, setGone] = useState(false);
+  const [gone, setGone] = useState(true);
 
   useEffect(() => {
+    const finish = () => {
+      setGone(true);
+      document.documentElement.dataset.introReady = "true";
+      window.dispatchEvent(new Event("intro-ready"));
+    };
+    const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    const skip = document.documentElement.dataset.introReady === "true" || navigation?.type === "back_forward";
+    if (skip) {
+      const ready = setTimeout(finish, 0);
+      return () => clearTimeout(ready);
+    }
+    const start = setTimeout(() => setGone(false), 0);
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) finish();
+    };
+    window.addEventListener("pageshow", onPageShow);
     const stepMs = 50;
     const step = 100 / (MIN_DURATION / stepMs);
     const iv = setInterval(() => {
@@ -71,13 +90,11 @@ export default function Preloader() {
     const initialTip = setTimeout(showTip, 0);
     const tipIv = setInterval(showTip, TIP_INTERVAL);
     const t1 = setTimeout(() => setHiding(true), MIN_DURATION);
-    const t2 = setTimeout(() => {
-      setGone(true);
-      document.documentElement.dataset.introReady = "true";
-      window.dispatchEvent(new Event("intro-ready"));
-    }, MIN_DURATION + 700);
+    const t2 = setTimeout(finish, MIN_DURATION + 700);
 
     return () => {
+      clearTimeout(start);
+      window.removeEventListener("pageshow", onPageShow);
       clearInterval(iv);
       clearInterval(tipIv);
       clearTimeout(initialTip);
@@ -95,7 +112,7 @@ export default function Preloader() {
         hiding ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
-      <div className="text-white text-2xl md:text-3xl font-bold tracking-tight">
+      <div className={`${brandFont.className} text-zinc-100 text-3xl md:text-4xl uppercase tracking-[.16em]`}>
         Mert Makina
       </div>
       <div

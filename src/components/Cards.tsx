@@ -23,7 +23,7 @@ export function CategoryCard({ category, locale, count }: { category: Category; 
   return (
     <Link
       href={`/${locale}/urunlerimiz/${category.slug}`}
-      className="group block rounded-2xl overflow-hidden bg-zinc-900 hover:bg-zinc-800 transition-colors"
+      className="group flex flex-col h-full rounded-2xl overflow-hidden bg-zinc-900 hover:bg-zinc-800 transition-colors"
     >
       {category.image ? (
         <div className="bg-white">
@@ -33,9 +33,11 @@ export function CategoryCard({ category, locale, count }: { category: Category; 
       ) : (
         <PlaceholderImage dark />
       )}
-      <div className="p-4 flex items-center justify-between">
-        <div>
-          <div className="font-semibold text-white">{name}</div>
+      <div className="px-3 py-2.5 sm:px-4 sm:py-3 flex flex-1 items-center justify-between gap-2">
+        <div className="min-w-0">
+          <div className="font-semibold text-white text-xs sm:text-sm min-h-10 leading-5 flex items-center">
+            <span>{name.includes(" (") ? <>{name.slice(0, name.indexOf(" ("))}<span className="block">{name.slice(name.indexOf(" (") + 1)}</span></> : name}</span>
+          </div>
           {count !== undefined && (
             <div className="text-xs text-zinc-500 mt-1">{count} {locale === "en" ? "products" : "ürün"}</div>
           )}

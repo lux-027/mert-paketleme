@@ -34,6 +34,13 @@
       "name": "Mikser Karıştırıcılar",
       "nameEn": "Mixers & Blenders",
       "image": "/mikser-karistirici.webp"
+    },
+    {
+      "id": "10",
+      "slug": "tasima-elevatorleri",
+      "name": "Taşıma Elevatörleri (Helezon ve Konveyör Bant)",
+      "nameEn": "Conveying Elevators (Screw and Belt Conveyors)",
+      "image": "/tasima-elevatorleri.webp"
     }
   ],
   "products": [],
