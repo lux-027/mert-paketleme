@@ -22,7 +22,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
           {session && (
             <div className="flex w-full lg:w-auto flex-wrap items-center gap-3">
-            <Link href="/tr" className="rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-300 hover:border-zinc-400 hover:text-white transition-colors">Siteyi Gör ↗</Link>
             <div className="hidden xl:block max-w-44 truncate text-xs text-zinc-500" title={session.user?.email ?? ""}>{session.user?.email}</div>
             <form
               action={async () => {
