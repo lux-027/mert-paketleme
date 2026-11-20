@@ -83,6 +83,9 @@ export function deleteCategory(id: string) {
 
 export function saveProduct(input: Partial<Product> & { name: string; categoryId: string }): Product {
   const store = read();
+  if (input.featured) {
+    store.products = store.products.map((product) => product.categoryId === input.categoryId && product.id !== input.id ? { ...product, featured: false } : product);
+  }
   if (input.id) {
     const idx = store.products.findIndex((p) => p.id === input.id);
     if (idx >= 0) {

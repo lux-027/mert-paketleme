@@ -3,6 +3,7 @@
 import fs from "fs";
 import path from "path";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { auth, ALLOWED_EMAILS } from "@/auth";
 import {
   saveCategory,
@@ -10,6 +11,8 @@ import {
   saveProduct,
   deleteProduct,
   slugify,
+  getProducts,
+  getCategories,
 } from "@/lib/store";
 
 async function requireAdmin() {
@@ -36,7 +39,8 @@ export async function saveCategoryAction(formData: FormData) {
     nameEn: (formData.get("nameEn") as string) || "",
     image: image ?? (formData.get("existingImage") as string) ?? "",
   });
-  revalidatePath("/");
+  revalidatePath("/", "layout");
+  redirect("/admin/categories");
 }
 
 export async function deleteCategoryAction(formData: FormData) {
@@ -47,18 +51,29 @@ export async function deleteCategoryAction(formData: FormData) {
 
 export async function saveProductAction(formData: FormData) {
   await requireAdmin();
+  const id = (formData.get("id") as string) || undefined;
+  const name = (formData.get("name") as string)?.trim();
+  const categoryId = formData.get("categoryId") as string;
+  const description = (formData.get("description") as string) || "";
+  const featured = formData.get("featured") === "on";
+  if (!name || !getCategories().some((category) => category.id === categoryId)) throw new Error("Ürün adı ve geçerli bir kategori gereklidir.");
+  const products = getProducts();
+  const existing = products.find((product) => product.id === id);
+  const replaced = products.find((product) => product.featured && product.categoryId === categoryId && product.id !== id);
+  if (featured && replaced && formData.get("confirmedFeaturedId") !== replaced.id) throw new Error("Bu kategorinin öne çıkan ürünü değişti. Sayfayı yenileyip değiştirme işlemini onaylayın.");
   const image = await saveUpload(formData.get("image") as File | null);
   saveProduct({
-    id: (formData.get("id") as string) || undefined,
-    name: formData.get("name") as string,
-    nameEn: (formData.get("nameEn") as string) || "",
-    categoryId: formData.get("categoryId") as string,
-    description: (formData.get("description") as string) || "",
-    descriptionEn: (formData.get("descriptionEn") as string) || "",
-    image: image ?? (formData.get("existingImage") as string) ?? "",
-    featured: formData.get("featured") === "on",
+    id,
+    name,
+    nameEn: existing?.name === name ? existing.nameEn : "",
+    categoryId,
+    description,
+    descriptionEn: existing?.description === description ? existing.descriptionEn : "",
+    image: image ?? existing?.image ?? "",
+    featured,
   });
-  revalidatePath("/");
+  revalidatePath("/", "layout");
+  redirect("/admin/products");
 }
 
 export async function deleteProductAction(formData: FormData) {
