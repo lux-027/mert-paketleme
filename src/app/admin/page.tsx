@@ -1,10 +1,12 @@
 import Link from "next/link";
+import AdminEditor from "@/components/AdminEditor";
 import { auth } from "@/auth";
 import { getStore } from "@/lib/store";
 import fs from "fs";
 import path from "path";
 
-export default async function AdminPage() {
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ messages?: string }> }) {
+  const { messages: showMessages } = await searchParams;
   const session = await auth();
   const store = getStore();
   let messages: { name: string; email: string; message: string; date: string }[] = [];
@@ -32,15 +34,15 @@ export default async function AdminPage() {
         {[
           { label: "Kategori", count: store.categories.length, detail: "Makine gruplarını yönetin", href: "/admin/categories", icon: "M3 7V5a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2ZM3 10h18" },
           { label: "Ürün", count: store.products.length, detail: "Ürün kütüphanesini inceleyin", href: "/admin/products", icon: "m12 3 9 5v9l-9 5-9-5V8ZM3 8l9 5 9-5M12 13v9M7.5 5.5l9 5" },
-          { label: "İletişim Mesajı", count: messages.length, detail: "Müşteri taleplerini görüntüleyin", href: "#messages", icon: "M3 5h18v14H3ZM3 5l9 8 9-8" },
+          { label: "İletişim Mesajı", count: messages.length, detail: "Müşteri taleplerini görüntüleyin", href: "/admin?messages=1", icon: "M3 5h18v14H3ZM3 5l9 8 9-8" },
         ].map((stat, index) => (
-          <Link key={stat.label} href={stat.href} className={`group relative isolate overflow-hidden rounded-2xl border p-5 sm:p-6 text-white shadow-md hover:shadow-xl transition-all duration-300 ${["border-zinc-700 bg-gradient-to-br from-zinc-800 via-zinc-950 to-black hover:border-zinc-500", "border-slate-600/60 bg-gradient-to-br from-slate-700 via-slate-900 to-zinc-950 hover:border-slate-400", "border-teal-800/70 bg-gradient-to-br from-teal-900 via-[#102c2c] to-zinc-950 hover:border-teal-600"][index]}`}>
+          <Link key={stat.label} href={stat.href} scroll={index !== 2} aria-haspopup={index === 2 ? "dialog" : undefined} className={`group relative isolate overflow-hidden rounded-2xl border p-5 sm:p-6 text-white shadow-md hover:shadow-xl transition-all duration-300 ${["border-zinc-700 bg-gradient-to-br from-zinc-800 via-zinc-950 to-black hover:border-zinc-500", "border-slate-600/60 bg-gradient-to-br from-slate-700 via-slate-900 to-zinc-950 hover:border-slate-400", "border-teal-800/70 bg-gradient-to-br from-teal-900 via-[#102c2c] to-zinc-950 hover:border-teal-600"][index]}`}>
             <svg aria-hidden="true" viewBox="0 0 220 180" fill="none" stroke="currentColor" className={`pointer-events-none absolute right-0 top-0 h-full w-44 opacity-20 group-hover:opacity-35 transition-opacity ${["text-zinc-400", "text-sky-300", "text-teal-300"][index]}`}>
               {index === 0 && <g><circle cx="195" cy="80" r="72" /><circle cx="195" cy="80" r="51" /><circle cx="195" cy="80" r="28" /><path d="M195 0v180M100 80h120M0 145h85l40-40M35 0v180M75 0v180" strokeWidth=".7" /><circle cx="85" cy="145" r="4" /></g>}
               {index === 1 && <g strokeLinejoin="round"><path d="m150 20 57 32v64l-57 32-57-32V52Zm-57 32 57 32 57-32M150 84v64m-29-112 57 32v23M35 157h130M50 163v-12m100 12v-12M35 30v100m-5-90 5-10 5 10m-10 80 5 10 5-10" /><path d="M0 130h220M0 170h220" strokeWidth=".5" /></g>}
               {index === 2 && <g><rect x="80" y="35" width="124" height="80" rx="12" /><path d="m80 45 62 42 62-42M80 106l38-35m86 35-38-35M100 115v18l23-18M20 145h65m-45 15h85" /><circle cx="142" cy="75" r="76" strokeDasharray="3 8" /><circle cx="20" cy="145" r="4" /></g>}
             </svg>
-            <div className="relative flex items-start justify-between gap-3"><span className={`flex h-11 w-11 items-center justify-center rounded-xl border border-white/15 bg-white/5 shadow-inner ${["text-zinc-200", "text-sky-200", "text-teal-200"][index]}`}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="h-5 w-5"><path d={stat.icon} /></svg></span><span aria-hidden="true" className="text-white/40 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all">↗</span></div>
+            <div className="relative flex items-start justify-between gap-3"><span className={`flex h-11 w-11 items-center justify-center rounded-xl border border-white/15 bg-white/5 shadow-inner ${["text-zinc-200", "text-sky-200", "text-teal-200"][index]}`}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="h-5 w-5"><path d={stat.icon} /></svg></span>{index === 2 && messages.length > 0 ? <span aria-label={`${messages.length} kayıtlı mesaj`} className="flex min-w-6 h-6 items-center justify-center rounded-full border border-red-300/30 bg-red-500 px-1.5 text-[10px] font-bold text-white shadow-lg shadow-red-950/30">{messages.length > 99 ? "99+" : messages.length}</span> : <span aria-hidden="true" className="text-white/40 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all">↗</span>}</div>
             <div className="relative mt-5 flex items-baseline gap-3"><span className="text-4xl font-semibold tracking-tight tabular-nums">{stat.count}</span><span className="text-sm text-white/65">{stat.label}</span></div>
             <p className="relative mt-4 border-t border-white/10 pt-3 text-[11px] text-white/50">{stat.detail}</p>
           </Link>
@@ -65,22 +67,21 @@ export default async function AdminPage() {
           <section className="rounded-2xl border border-zinc-200 bg-zinc-100/70 p-5 sm:p-6"><p className="text-[10px] uppercase tracking-[.2em] text-zinc-500">Yayın öncesi kontrol</p><h2 className="mt-3 text-sm font-semibold">İçeriğinizi eksiksiz hazırlayın</h2><ul className="mt-3 space-y-2 text-xs leading-relaxed text-zinc-500"><li>01 — Ürün adını ve açıklamasını Türkçe girin.</li><li>02 — Doğru kategori ve net bir görsel seçin.</li><li>03 — Kaydettikten sonra sitedeki görünümü inceleyin.</li></ul><p className="mt-4 border-t border-zinc-200 pt-3 text-xs leading-relaxed text-zinc-600">Not: Mevcut dosya tabanlı kayıt sistemi Vercel üzerinde kalıcı depolama sağlamaz. Canlı içerik yönetimi için veritabanı ve görsel depolama bağlantısı gereklidir.</p></section>
         </div>
       </div>
-      {messages.length === 0 && <section id="messages" className="mt-6 rounded-2xl border border-dashed border-zinc-300 p-6 text-center"><h2 className="text-sm font-semibold">Gelen kutunuz boş</h2><p className="mt-2 text-xs text-zinc-500">Kaydedilen iletişim mesajları bu alanda listelenecek.</p></section>}
-      {messages.length > 0 && (
-        <div id="messages" className="mt-10">
-          <h2 className="font-bold text-lg mb-4">Son Mesajlar</h2>
-          <div className="space-y-3">
-            {messages.slice(0, 10).map((m, i) => (
-              <div key={i} className="bg-white border border-zinc-200 rounded-xl p-4 text-sm">
-                <div className="font-semibold">
-                  {m.name} <span className="text-zinc-400 font-normal">({m.email})</span>
-                </div>
-                <div className="text-zinc-600 mt-1">{m.message}</div>
-                <div className="text-xs text-zinc-400 mt-2">{m.date}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+      {showMessages === "1" && (
+        <AdminEditor editing title="İletişim mesajları" back="/admin" compact>
+          <div className="mb-4 flex items-center justify-between gap-3"><p className="text-xs text-zinc-500">En yeni mesajlar üstte listelenir.</p><span className="shrink-0 rounded-full bg-zinc-950 px-3 py-1 text-[10px] text-white">{messages.length} mesaj</span></div>
+          {messages.length === 0 ? <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-8 text-center"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mx-auto h-10 w-10 text-zinc-300"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m3 6 9 7 9-7" /></svg><h3 className="mt-4 text-sm font-semibold">Gelen kutunuz boş</h3><p className="mt-2 text-xs leading-relaxed text-zinc-500">İletişim formundan kaydedilen mesajlar burada görünecek.</p></div> : (
+            <div className="space-y-3">
+              {messages.map((m, i) => (
+                <article key={i} className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-4 text-sm">
+                  <div className="flex items-start gap-3"><span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-xs font-semibold text-white">{m.name.slice(0, 1).toLocaleUpperCase("tr")}</span><div className="min-w-0"><h3 className="font-semibold break-words">{m.name}</h3><p className="mt-1 break-all text-xs text-zinc-500">{m.email}</p></div></div>
+                  <p className="mt-4 border-t border-zinc-100 pt-3 whitespace-pre-wrap break-words text-zinc-600 leading-relaxed">{m.message}</p>
+                  <time dateTime={m.date} className="mt-3 block text-[10px] text-zinc-400">{Number.isNaN(Date.parse(m.date)) ? m.date : new Date(m.date).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul", dateStyle: "medium", timeStyle: "short" })}</time>
+                </article>
+              ))}
+            </div>
+          )}
+        </AdminEditor>
       )}
     </div>
   );
