@@ -3,11 +3,17 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+import { PHOTO_TYPES as photoTypes, photoError } from "@/lib/photo-upload";
+import { movePhoto } from "@/lib/gallery-order";
+
 type Photo = { url: string; file?: File };
-const photoTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
 
 export default function ProductGalleryFields({ images = [], video = "", uploadsEnabled }: { images?: string[]; video?: string; uploadsEnabled: boolean }) {
   const [photos, setPhotos] = useState<Photo[]>(images.map((url) => ({ url })));
+  const photosRef = useRef(photos);
+  const gallery = useRef<HTMLDivElement>(null);
+  const dragging = useRef<Photo | null>(null);
+  const [dragged, setDragged] = useState<string | null>(null);
   const [videoPreview, setVideoPreview] = useState(video);
   const [removeVideo, setRemoveVideo] = useState(false);
   const [error, setError] = useState("");
@@ -22,28 +28,48 @@ export default function ProductGalleryFields({ images = [], video = "", uploadsE
     const transfer = new DataTransfer();
     next.forEach((photo) => { if (photo.file) transfer.items.add(photo.file); });
     if (input.current) input.current.files = transfer.files;
+    photosRef.current = next;
     setPhotos(next);
   };
   return (
     <div className="sm:col-span-2 lg:col-span-3 min-w-0 space-y-4">
       <input type="hidden" name="mediaFields" value="1" />
       {photos.filter((photo) => !photo.file).map((photo) => <input key={photo.url} type="hidden" name="retainedImage" value={photo.url} />)}
+      {photos.map((photo, index) => <input key={`order-${photo.url}`} type="hidden" name="galleryOrder" value={photo.file ? `new:${photos.slice(0, index).filter((item) => item.file).length}` : `existing:${photo.url}`} />)}
       {removeVideo && <input type="hidden" name="removeVideo" value="on" />}
       <section className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 sm:p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-xs font-semibold">Diğer fotoğraflar</h3><span className="text-[10px] text-zinc-400">{photos.length}/6 fotoğraf · En fazla 2 MB/adet</span></div>
-        <p className="mt-1 text-[10px] leading-relaxed text-zinc-500">Kapak fotoğrafından ayrı olarak detay ve farklı açı fotoğrafları ekleyin.</p>
-        <div className="mt-3 grid grid-cols-3 sm:grid-cols-6 gap-2">
-          {photos.map((photo, index) => <div key={photo.url} className="relative aspect-square overflow-hidden rounded-lg border border-zinc-200 bg-white">
-            <Image src={photo.url} alt={`Galeri fotoğrafı ${index + 1}`} fill unoptimized className="object-contain p-1" />
+        <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-xs font-semibold">Diğer fotoğraflar</h3><span className="text-[10px] text-zinc-400">{photos.length}/6 fotoğraf · En fazla 20 MB/adet</span></div>
+        <p className="mt-1 text-[10px] leading-relaxed text-zinc-500">Büyük fotoğraflar otomatik küçültülür. Sıralamak için fotoğrafın altındaki tutma simgesini basılı tutup sürükleyin.</p>
+        <div ref={gallery} className="mt-3 grid grid-cols-3 sm:grid-cols-6 gap-2" onPointerMove={(event) => {
+          const photo = dragging.current;
+          if (!photo) return;
+          const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>("[data-photo-index]");
+          if (!target || !gallery.current?.contains(target)) return;
+          syncPhotos(movePhoto(photosRef.current, photosRef.current.findIndex((item) => item.url === photo.url), Number(target.dataset.photoIndex)));
+        }} onPointerUp={() => { dragging.current = null; setDragged(null); }} onPointerCancel={() => { dragging.current = null; setDragged(null); }} onLostPointerCapture={() => { dragging.current = null; setDragged(null); }}>
+          {photos.map((photo, index) => <div key={photo.url} data-photo-index={index} className={`relative aspect-square overflow-hidden rounded-lg border bg-white ${dragged === photo.url ? "border-zinc-950 ring-2 ring-zinc-500 opacity-60" : "border-zinc-200"}`}>
+            <Image src={photo.url} alt={`Galeri fotoğrafı ${index + 1}`} fill unoptimized draggable={false} className="object-contain p-1 pb-8" />
             <button type="button" aria-label={`${index + 1}. fotoğrafı kaldır`} onClick={() => { if (photo.file) { URL.revokeObjectURL(photo.url); urls.current.delete(photo.url); } syncPhotos(photos.filter((item) => item !== photo)); }} className="absolute right-0 top-0 flex h-8 w-8 items-center justify-center rounded-bl-lg bg-black/80 text-white"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4"><path d="m6 6 12 12M6 18 18 6" /></svg></button>
-            <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1 text-[9px] text-white">{index + 1}</span>
+            <button type="button" aria-label={`${index + 1}. fotoğrafı sürükleyerek veya sağ/sol ok tuşlarıyla taşı`} className="absolute bottom-0 inset-x-0 flex h-8 touch-none items-center justify-between border-t border-zinc-200 bg-zinc-100 px-2 text-[10px] text-zinc-600 cursor-grab active:cursor-grabbing" onPointerDown={(event) => {
+              if (event.button !== 0) return;
+              event.preventDefault();
+              dragging.current = photo;
+              setDragged(photo.url);
+              gallery.current?.setPointerCapture(event.pointerId);
+            }} onKeyDown={(event) => {
+              if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+              event.preventDefault();
+              const from = photosRef.current.findIndex((item) => item.url === photo.url);
+              syncPhotos(movePhoto(photosRef.current, from, from + (event.key === "ArrowLeft" ? -1 : 1)));
+            }}><span>{index + 1}</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" /><circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" /><circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" /></svg></button>
           </div>)}
           {photos.length < 6 && <label className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-zinc-300 bg-white text-zinc-500 ${uploadsEnabled ? "cursor-pointer hover:border-zinc-600" : "opacity-50"}`} htmlFor="product-gallery"><span aria-hidden="true" className="text-xl">+</span><span className="text-[10px]">Fotoğraf ekle</span></label>}
         </div>
         <input ref={input} id="product-gallery" type="file" name="gallery" multiple disabled={!uploadsEnabled} accept={photoTypes.join(",")} className="sr-only" aria-label="Galeri fotoğrafları ekle" onChange={(event) => {
           const files = Array.from(event.target.files ?? []);
-          if (files.some((file) => !photoTypes.includes(file.type) || file.size > 2 * 1024 * 1024) || photos.length + files.length > 6) {
-            setError("En fazla 6 galeri fotoğrafı ekleyin. JPG, PNG, WebP, GIF veya AVIF, her biri en fazla 2 MB olmalıdır.");
+          const fileError = files.map(photoError).find(Boolean);
+          if (fileError || photos.length + files.length > 6) {
+            setError(fileError || "En fazla 6 galeri fotoğrafı ekleyebilirsiniz.");
             syncPhotos(photos);
             return;
           }

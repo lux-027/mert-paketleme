@@ -11,5 +11,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Verification
 
 - Run `npm run lint`, `npx tsc --noEmit`, and `npm run build`.
-- Run `node --test tests/persistence.test.cjs` for mocked Neon concurrency, setup, Cloudinary receipt validation, and upload authorization tests. These tests do not contact external services or modify production data.
+- Run `node --test tests/persistence.test.mjs` for mocked Neon concurrency, setup, Cloudinary receipt validation, and upload authorization tests. These tests do not contact external services or modify production data.
 - Neon initialization is an explicit authenticated action in the admin dashboard. It creates application tables and inserts initial content without overwriting existing rows. Builds do not initialize the database.

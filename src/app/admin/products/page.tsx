@@ -31,10 +31,12 @@ export default async function ProductsAdmin({
       <div className="mb-5 sm:mb-8 flex items-end justify-between gap-3 sm:gap-4"><div><p className="text-[10px] uppercase tracking-[.25em] text-zinc-500">Katalog yönetimi</p><h1 className="mt-2 text-3xl font-semibold tracking-tight">Ürünler</h1><p className="mt-2 text-sm text-zinc-500">Makine bilgilerini, görsellerini ve kategori yerleşimini yönetin.</p></div><span className="shrink-0 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-500">{products.length} ürün</span></div>
       {selectedCategory && <div className="mb-5 flex flex-wrap items-center gap-3"><span className="rounded-full bg-zinc-950 px-4 py-2 text-xs text-white">{selectedCategory.name}</span><Link href="/admin/products" className="text-xs text-zinc-500 hover:text-black">Tüm ürünleri göster</Link></div>}
       <div className="mb-6 flex justify-end"><Link href={`${basePath}${querySeparator}new=1`} scroll={false} className="rounded-lg sm:rounded-xl bg-black px-3.5 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white hover:bg-zinc-800 transition-colors">+ Yeni ürün ekle</Link></div>
-      {(editing || create === "1") && <AdminEditor editing title={editing ? "Ürünü düzenle" : "Yeni ürün ekle"} back={basePath}>
+      {(editing || create === "1") && <AdminEditor editing title={editing ? "Ürünü düzenle" : "Yeni ürün ekle"} back={basePath} formFooter>
       <AdminForm
         key={editing?.id ?? "new"}
         action={saveProductAction}
+        submitLabel={editing ? "Güncelle" : "Ekle"}
+        submitDisabled={categories.length === 0}
         className="bg-white border border-zinc-200 shadow-sm rounded-2xl p-3 sm:p-6 grid gap-3 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3"
       >
         <input type="hidden" name="id" value={editing?.id ?? ""} />
@@ -55,9 +57,6 @@ export default async function ProductsAdmin({
         </div>
         <ProductMediaFields uploadsEnabled={cloudinaryConfigured()} existingImage={editing?.image ?? ""} defaultFeatured={editing?.featured ?? false} defaultCategoryId={editing?.categoryId ?? selectedCategory?.id ?? ""} productId={editing?.id} featuredProducts={allProducts.filter((product) => product.featured).map(({ id, name, categoryId, image }) => ({ id, name, categoryId, image }))} />
         <ProductGalleryFields images={editing?.images} video={editing?.video} uploadsEnabled={cloudinaryConfigured()} />
-        <button disabled={categories.length === 0} className="bg-black hover:bg-zinc-800 text-white text-xs sm:text-sm font-semibold py-2 sm:py-3 rounded-xl self-end transition-colors disabled:opacity-40">
-          {editing ? "Güncelle" : "Ekle"}
-        </button>
       </AdminForm>
       </AdminEditor>}
 

@@ -5,6 +5,7 @@ import { auth, ALLOWED_EMAILS } from "@/auth";
 import { saveCategory, deleteCategory, saveProduct, deleteProduct, getCategories, getProducts } from "@/lib/store";
 import { initializeDatabase } from "@/lib/database";
 import { readMediaReceipt } from "@/lib/cloudinary";
+import { orderedGallery } from "@/lib/gallery-order";
 import { UserError } from "@/lib/types";
 import type { ActionResult } from "@/lib/types";
 
@@ -70,7 +71,7 @@ export async function saveProductAction(data: FormData): Promise<ActionResult> {
     const tokens = data.getAll("galleryUpload");
     if (tokens.length > 6) throw new UserError("En fazla 6 galeri fotoğrafı ekleyebilirsiniz.");
     const retained = data.has("mediaFields") ? (existing?.images ?? []).filter((url) => data.getAll("retainedImage").includes(url)) : existing?.images ?? [];
-    const images = [...new Set([...retained, ...tokens.map((token) => readMediaReceipt(token, "image", email)!)])];
+    const images = orderedGallery(retained, tokens.map((token) => readMediaReceipt(token, "image", email)!), data.getAll("galleryOrder"));
     if (images.length > 6) throw new UserError("Kapak dışında en fazla 6 galeri fotoğrafı ekleyebilirsiniz.");
     const image = readMediaReceipt(data.get("imageUpload"), "image", email);
     const video = readMediaReceipt(data.get("videoUpload"), "video", email);

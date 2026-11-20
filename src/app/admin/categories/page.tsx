@@ -21,11 +21,12 @@ export default async function CategoriesAdmin({
     <div>
       <div className="mb-8 flex items-end justify-between gap-4"><div><p className="text-[10px] uppercase tracking-[.25em] text-zinc-500">Katalog yönetimi</p><h1 className="mt-2 text-3xl font-semibold tracking-tight">Kategoriler</h1><p className="mt-2 text-sm text-zinc-500">Makine gruplarını ve kategori kapaklarını düzenleyin.</p></div><span className="shrink-0 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-500">{categories.length} kategori</span></div>
       <div className="mb-6 flex justify-end"><Link href="/admin/categories?new=1" scroll={false} className="rounded-lg sm:rounded-xl bg-black px-3.5 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white hover:bg-zinc-800 transition-colors">+ Yeni kategori ekle</Link></div>
-      {(editing || create === "1") && <AdminEditor editing title={editing ? "Kategoriyi düzenle" : "Yeni kategori ekle"} back="/admin/categories" compact>
+      {(editing || create === "1") && <AdminEditor editing title={editing ? "Kategoriyi düzenle" : "Yeni kategori ekle"} back="/admin/categories" compact formFooter>
       <AdminForm
         key={editing?.id ?? "new"}
         id="category-form"
         action={saveCategoryAction}
+        submitLabel={editing ? "Güncelle" : "Ekle"}
         className="bg-white border border-zinc-200 shadow-sm rounded-2xl p-3 sm:p-6 grid grid-cols-1 gap-3 sm:gap-5"
       >
         <input type="hidden" name="id" value={editing?.id ?? ""} />
@@ -42,9 +43,6 @@ export default async function CategoriesAdmin({
           <label className="text-xs text-zinc-500">Kapak Resmi</label>
           <input name="image" type="file" disabled={!cloudinaryConfigured()} accept="image/jpeg,image/png,image/webp,image/gif,image/avif" className={input} />
         </div>
-        <button className="bg-black hover:bg-zinc-800 text-white text-sm font-semibold py-2 sm:py-3 rounded-xl transition-colors">
-          {editing ? "Güncelle" : "Ekle"}
-        </button>
       </AdminForm>
       </AdminEditor>}
 

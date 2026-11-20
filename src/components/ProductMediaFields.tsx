@@ -1,5 +1,7 @@
 "use client";
 
+import { photoError } from "@/lib/photo-upload";
+
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -50,9 +52,10 @@ export default function ProductMediaFields({ existingImage, defaultFeatured, def
           <input type="file" name="image" disabled={!uploadsEnabled} accept="image/jpeg,image/png,image/webp,image/gif,image/avif" aria-label="Kapak fotoğrafı seç" className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0" onChange={(event) => {
             const file = event.target.files?.[0];
             event.target.setCustomValidity("");
-            if (file && (!["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"].includes(file.type) || file.size > 2 * 1024 * 1024)) {
+            const error = file ? photoError(file) : "";
+            if (error) {
               event.target.value = "";
-              event.target.setCustomValidity("Kapak JPG, PNG, WebP, GIF veya AVIF olmalı ve 2 MB’ı geçmemelidir.");
+              event.target.setCustomValidity(error);
               event.target.reportValidity();
               return;
             }
@@ -64,7 +67,7 @@ export default function ProductMediaFields({ existingImage, defaultFeatured, def
           {preview ? <Image src={preview} alt="Seçilen ürün fotoğrafı" fill unoptimized className="object-contain p-2" /> : <><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-9 w-9 text-zinc-400"><rect x="3" y="4" width="18" height="16" rx="3" /><circle cx="8" cy="9" r="1.5" /><path d="m3 17 5-5 4 4 4-5 5 6" /></svg><span className="mt-3 text-xs font-medium text-zinc-600">Fotoğraf seç</span></>}
           {preview && <span className="absolute bottom-0 inset-x-0 bg-black/75 p-2 text-center text-[10px] text-white">Fotoğrafı değiştirmek için tıklayın</span>}
         </label>
-        <p className="mt-2 truncate text-[10px] text-zinc-400">{fileName || "Kare veya yatay, net bir görsel seçin."}</p>
+        <p className="mt-2 truncate text-[10px] text-zinc-400">{fileName || "En fazla 20 MB. Büyük fotoğraflar otomatik küçültülür."}</p>
       </div>
       <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
         <label className="flex cursor-pointer items-center gap-3 bg-zinc-950 p-3 sm:p-4 text-white">

@@ -1,16 +1,18 @@
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const vm = require('node:vm');
-const ts = require('typescript');
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import vm from 'node:vm';
+import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
-const root = path.join(__dirname, '..');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 function load(file, mocks = {}, globals = {}) {
   const source = fs.readFileSync(path.join(root, file), 'utf8');
-  const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
+  const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true, jsx: ts.JsxEmit.ReactJSX } }).outputText;
   const mod = { exports: {} };
-  vm.runInNewContext(code, { module: mod, exports: mod.exports, require(name) { if (name in mocks) return mocks[name]; if (name === 'server-only') return {}; if (['crypto', 'path'].includes(name)) return require(name); throw Error(`Unexpected import: ${name}`); }, Buffer, URL, AbortSignal, FormData, File, structuredClone, process: { env: {}, cwd: () => root }, ...globals });
+  vm.runInNewContext(code, { module: mod, exports: mod.exports, require(name) { if (name in mocks) return mocks[name]; if (name === 'server-only') return {}; if (name === 'crypto') return crypto; if (name === 'path') return path; throw Error(`Unexpected import: ${name}`); }, Buffer, URL, AbortSignal, FormData, File, structuredClone, process: { env: {}, cwd: () => root }, ...globals });
   return mod.exports;
 }
 const types = load('src/lib/types.ts');
@@ -120,4 +122,86 @@ test('upload API blocks unauthorized and cross-origin requests before signing', 
   assert.equal(calls, 0);
   assert.equal((await route.POST(request('https://site.example.test'))).status, 200);
   assert.equal(calls, 1);
+});
+
+test('large photos are resized, compressed and released before upload', async () => {
+  let closed = false;
+  const sizes = [];
+  const canvas = { width: 0, height: 0, getContext: () => ({ drawImage() {} }), toBlob(done) { sizes.push([canvas.width, canvas.height]); done(new Blob([new Uint8Array(sizes.length < 5 ? 3 * 1024 * 1024 : 500000)], { type: 'image/webp' })); } };
+  const photos = load('src/lib/photo-upload.ts', {}, { createImageBitmap: async () => ({ width: 6000, height: 4000, close() { closed = true; } }), document: { createElement: () => canvas } });
+  const original = new File([new Uint8Array(4 * 1024 * 1024)], 'machine.jpg', { type: 'image/jpeg' });
+  const result = await photos.optimizePhoto(original);
+  assert.equal(result.type, 'image/webp');
+  assert.equal(result.name, 'machine.webp');
+  assert(result.size <= photos.PHOTO_UPLOAD_LIMIT);
+  assert(sizes.length >= 5);
+  assert(sizes.every(([width, height]) => width <= 2400 && Math.abs(width / height - 1.5) < 0.01));
+  assert(closed);
+});
+
+test('small photos pass through; invalid, huge and animated GIF inputs stay bounded', async () => {
+  const photos = load('src/lib/photo-upload.ts', {}, { createImageBitmap() { throw Error('Unexpected decode'); } });
+  const small = new File(['small'], 'small.png', { type: 'image/png' });
+  assert.equal(await photos.optimizePhoto(small), small);
+  assert.equal(photos.photoError(new File([new Uint8Array(4 * 1024 * 1024)], 'large.jpg', { type: 'image/jpeg' })), '');
+  await assert.rejects(photos.optimizePhoto(new File([new Uint8Array(21 * 1024 * 1024)], 'huge.jpg', { type: 'image/jpeg' })));
+  await assert.rejects(photos.optimizePhoto(new File([new Uint8Array(3 * 1024 * 1024)], 'animated.gif', { type: 'image/gif' })));
+  await assert.rejects(photos.optimizePhoto(new File(['bad'], 'bad.svg', { type: 'image/svg+xml' })));
+});
+
+test('photo decoder resources close on encoding failure', async () => {
+  let closed = false;
+  const photos = load('src/lib/photo-upload.ts', {}, { createImageBitmap: async () => ({ width: 3000, height: 2000, close() { closed = true; } }), document: { createElement: () => ({ getContext: () => ({ drawImage() {} }), toBlob: (done) => done(null) }) } });
+  await assert.rejects(photos.optimizePhoto(new File([new Uint8Array(3 * 1024 * 1024)], 'photo.jpg', { type: 'image/jpeg' })));
+  assert(closed);
+});
+
+test('gallery reordering preserves mixed saved/new photos and rejects injected references', () => {
+  const gallery = load('src/lib/gallery-order.ts', { './types': types });
+  const original = ['first', 'second', 'third'];
+  assert.deepEqual(Array.from(gallery.movePhoto(original, 2, 0)), ['third', 'first', 'second']);
+  assert.deepEqual(original, ['first', 'second', 'third']);
+  assert.equal(gallery.movePhoto(original, 0, -1), original);
+  assert.deepEqual(Array.from(gallery.orderedGallery(['/one', '/two'], ['/new'], ['existing:/two', 'new:0', 'existing:/one'])), ['/two', '/new', '/one']);
+  assert.throws(() => gallery.orderedGallery(['/one'], [], ['existing:https://foreign.example/image.jpg']));
+  assert.throws(() => gallery.orderedGallery(['/one', '/two'], [], ['existing:/one', 'existing:/one']));
+});
+
+test('product save keeps the selected mixed gallery order', async () => {
+  let saved;
+  const gallery = load('src/lib/gallery-order.ts', { './types': types });
+  const actions = load('src/app/admin/actions.ts', {
+    'next/cache': { revalidatePath() {} },
+    '@/auth': { auth: async () => ({ user: { email: 'allowed@example.test' } }), ALLOWED_EMAILS: ['allowed@example.test'] },
+    '@/lib/store': { getCategories: async () => [{ id: '1' }], getProducts: async () => [{ id: 'p1', name: 'Machine', images: ['/one', '/two'], video: '/movie.mp4' }], saveProduct: async (value) => { saved = value; } },
+    '@/lib/database': {}, '@/lib/cloudinary': { readMediaReceipt: (value) => value ? '/new' : null }, '@/lib/gallery-order': gallery, '@/lib/types': types,
+  });
+  const data = new FormData();
+  for (const [key, value] of [['id', 'p1'], ['name', 'Machine'], ['categoryId', '1'], ['mediaFields', '1'], ['retainedImage', '/one'], ['retainedImage', '/two'], ['galleryUpload', 'mock-receipt'], ['galleryOrder', 'new:0'], ['galleryOrder', 'existing:/two'], ['galleryOrder', 'existing:/one']]) data.append(key, value);
+  const result = await actions.saveProductAction(data);
+  assert.equal(result.error, undefined);
+  assert.deepEqual(Array.from(saved.images), ['/new', '/two', '/one']);
+  assert.equal(saved.video, '/movie.mp4');
+});
+
+test('editor scrolls the body separately from its footer', () => {
+  const jsx = (type, props) => ({ type, props });
+  const editor = load('src/components/AdminEditor.tsx', { react: { useEffect() {}, useId: () => 'title', useRef: () => ({ current: null }) }, 'react/jsx-runtime': { jsx, jsxs: jsx }, 'next/navigation': { useRouter: () => ({ push() {} }) } });
+  const tree = editor.default({ editing: true, title: 'Product', back: '/admin', children: 'form', formFooter: true });
+  const [, body, footer] = tree.props.children.props.children;
+  assert.match(body.props.className, /overflow-y-auto/);
+  assert.equal(footer.props.id, 'admin-editor-footer');
+  assert.match(footer.props.className, /shrink-0/);
+});
+
+test('fixed submit control targets its form and disables during upload', () => {
+  const jsx = (type, props) => ({ type, props });
+  const target = {};
+  const form = load('src/components/AdminForm.tsx', { react: { useEffect() {}, useId: () => 'form-id', useState: (value) => [value === null ? target : value, () => {}], useTransition: () => [true, () => {}] }, 'react/jsx-runtime': { jsx, jsxs: jsx }, 'react-dom': { createPortal: (node, target) => ({ node, target }) }, 'next/navigation': { useRouter: () => ({ replace() {}, refresh() {} }) }, '@/lib/media-upload': {} });
+  const tree = form.default({ action() {}, submitLabel: 'Ekle', children: 'fields' });
+  const portal = tree.props.children[1];
+  const button = portal.node.props.children[1];
+  assert.equal(portal.target, target);
+  assert.equal(button.props.form, tree.props.id);
+  assert.equal(button.props.disabled, true);
 });
